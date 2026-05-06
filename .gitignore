@@ -1,0 +1,32 @@
+# Terraform local state and plans
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Optional local Terraform variables
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Generated deployment artifacts
+*.zip
+placeholder.zip
+amplify-build.zip
+
+# Python build/runtime noise
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Generated at deploy time with environment-specific frontend values
+frontend-website/config.js
+
+# Local Terraform variable files
+infrastructure/terraform/root/backend.hcl
+infrastructure/terraform/root/terraform.tfvars

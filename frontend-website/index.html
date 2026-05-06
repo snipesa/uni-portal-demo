@@ -1,0 +1,2823 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>University Assignment Portal</title>
+    <style>
+      :root {
+        --brand-ink: #1f2a38;
+        --brand-blue: #2f6fa7;
+        --brand-gold: #f59f00;
+        --surface: #ffffff;
+        --surface-soft: #f4f7fb;
+        --line: #d5dfeb;
+        --text: #1a2430;
+        --text-muted: #5b6a7d;
+        --success: #0d8a5f;
+        --danger: #b23c3c;
+        --student: #2f6fa7;
+        --staff: #7a4fa3;
+        --ta: #0f887c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Avenir Next", "Segoe UI", "Trebuchet MS", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(1200px 700px at 0% -20%, #dcecff 0%, transparent 60%),
+          radial-gradient(900px 600px at 100% 0%, #fff3dc 0%, transparent 60%),
+          linear-gradient(180deg, #f7fbff 0%, #f2f5f9 100%);
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .topbar {
+        height: 64px;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(6px);
+      }
+
+      .brand-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .brand-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--brand-ink);
+      }
+
+      .brand-subtitle {
+        margin: 0;
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font-size: 0.84rem;
+        color: var(--text-muted);
+        background: #fff;
+      }
+
+      .badge {
+        padding: 6px 10px;
+        border-radius: 999px;
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+
+      .badge.student {
+        background: var(--student);
+      }
+
+      .badge.admin {
+        background: #9b3d12;
+      }
+
+      .badge.instructors {
+        background: var(--staff);
+      }
+
+      .badge.tas {
+        background: var(--ta);
+      }
+
+      .badge.ungrouped {
+        background: var(--danger);
+      }
+
+      .btn {
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 0.92rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+      }
+
+      .btn:disabled {
+        opacity: 0.65;
+        cursor: default;
+      }
+
+      .btn.primary {
+        background: linear-gradient(120deg, var(--brand-blue), #245884);
+        color: #fff;
+        box-shadow: 0 8px 20px rgba(36, 88, 132, 0.2);
+      }
+
+      .btn.primary:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+
+      .btn.accent {
+        background: linear-gradient(120deg, #f8ac1a, var(--brand-gold));
+        color: #2b2008;
+      }
+
+      .btn.ghost {
+        border-color: var(--line);
+        background: #fff;
+        color: var(--brand-ink);
+      }
+
+      .layout {
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 16px;
+        flex: 1;
+      }
+
+      .sidenav {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        height: fit-content;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .nav-btn {
+        width: 100%;
+        text-align: left;
+        border-radius: 10px;
+        padding: 10px 12px;
+        border: 1px solid transparent;
+        background: #fff;
+        color: var(--brand-ink);
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .nav-btn.active {
+        border-color: #b6d0ea;
+        background: #ecf5ff;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 18px;
+        background: var(--surface);
+      }
+
+      .panel .panel {
+        background: #f4f8ff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 20px;
+      }
+
+      .panel h3 {
+        font-size: 1rem;
+        color: var(--text);
+        font-weight: 700;
+        margin: 0 0 12px 0;
+      }
+
+      .hero {
+        padding: 28px;
+        background:
+          linear-gradient(125deg, #ffffff 0%, #f7fbff 45%, #fff8ec 100%);
+      }
+
+      .hero h2,
+      .panel h2 {
+        margin: 0 0 8px 0;
+      }
+
+      .muted {
+        color: var(--text-muted);
+      }
+
+      .inline {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .toast {
+        border-radius: 12px;
+        padding: 11px 12px;
+        border: 1px solid;
+        font-size: 0.9rem;
+      }
+
+      .toast.info {
+        background: #eef6ff;
+        border-color: #c8def7;
+        color: #214f7a;
+      }
+
+      .toast.success {
+        background: #eaf9f2;
+        border-color: #b8e5d1;
+        color: #0d6949;
+      }
+
+      .toast.error {
+        background: #fff0f0;
+        border-color: #f1c4c4;
+        color: #8f2f2f;
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field label {
+        font-size: 0.84rem;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .field input,
+      .field select {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 0.92rem;
+        min-width: 140px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+      }
+
+      th,
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #e9eef5;
+        text-align: left;
+        font-size: 0.88rem;
+      }
+
+      th {
+        background: #f8fbff;
+        color: #455a72;
+        font-weight: 700;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      .upload-form {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .upload-form .field.full {
+        grid-column: 1 / -1;
+      }
+
+      .hint {
+        margin-top: 8px;
+        color: var(--text-muted);
+        font-size: 0.82rem;
+      }
+
+      .link-btn {
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--brand-blue);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 700;
+        text-align: left;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        background: #eef3f8;
+        color: #41556c;
+      }
+
+      .status-pill.submitted {
+        background: #e8f2ff;
+        color: #245884;
+      }
+
+      .status-pill.needs-revision {
+        background: #fff3df;
+        color: #8b5b00;
+      }
+
+      .status-pill.graded {
+        background: #e8f8ef;
+        color: #0d6949;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .detail-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        background: #fff;
+      }
+
+      .detail-card h3 {
+        margin-top: 0;
+      }
+
+      .meta-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 14px;
+      }
+
+      .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .meta-item span:first-child {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        font-weight: 600;
+      }
+
+      .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .timeline-item {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px;
+        background: #fbfdff;
+      }
+
+      .timeline-meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 8px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .actions-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .admin-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .group-list {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .group-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--surface-soft);
+        color: var(--brand-ink);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+
+      @media (max-width: 900px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-grid,
+        .meta-list {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .upload-form {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <p class="brand-title">University Assignment Portal</p>
+          <p class="brand-subtitle">Student, TA, and Instructor workspace</p>
+        </div>
+        <div class="topbar-actions">
+          <span id="userEmail" class="chip hidden"></span>
+          <span id="roleBadge" class="badge hidden"></span>
+          <button id="signOutBtn" class="btn ghost hidden" type="button">Sign Out</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <nav id="sideNav" class="sidenav hidden" aria-label="Portal navigation">
+          <button class="nav-btn" data-route="dashboard" type="button">Dashboard</button>
+          <button class="nav-btn" data-route="admin" type="button">Admin</button>
+          <button class="nav-btn" data-route="courses" type="button">Courses</button>
+          <button class="nav-btn" data-route="upload" type="button">Upload Assignment</button>
+        </nav>
+
+        <section class="content">
+          <div id="toast" class="toast hidden"></div>
+
+          <section id="landingView" class="panel hero">
+            <h2>Submit, review, and grade in one place</h2>
+            <p class="muted">
+              Sign in with your university account to access submissions, upload flows,
+              and role-aware dashboard content.
+            </p>
+            <div class="inline" style="margin-top: 14px">
+              <button id="signInBtn" class="btn primary" type="button">
+                Sign In with University Account
+              </button>
+            </div>
+          </section>
+
+          <section id="ungroupedView" class="panel hidden">
+            <h2>Role Assignment Pending</h2>
+            <p class="muted">
+              Your account is authenticated but not assigned to a portal group yet.
+              Please contact an administrator to be added to Students or Staff.
+            </p>
+          </section>
+
+          <section id="adminDeniedView" class="panel hidden">
+            <h2>Admin Access Required</h2>
+            <p class="muted">
+              You do not have access to the admin portal.
+            </p>
+          </section>
+
+          <section id="adminView" class="panel hidden">
+            <h2 style="margin-top: 0">Admin Portal</h2>
+            <p class="muted" style="margin-top: 0">
+              Manage Cognito role assignment for portal users without using the AWS console.
+            </p>
+
+            <div class="admin-grid">
+              <div class="panel">
+                <h3>Find User</h3>
+                <form id="adminLookupForm" class="upload-form">
+                  <div class="field full">
+                    <label for="adminUserEmailInput">User Email</label>
+                    <input id="adminUserEmailInput" type="email" required placeholder="user@example.edu" />
+                  </div>
+                  <div class="field full">
+                    <button id="adminLookupBtn" class="btn accent" type="submit">Find User</button>
+                  </div>
+                </form>
+                <p id="adminLookupHint" class="hint"></p>
+              </div>
+
+              <div class="panel">
+                <h3>User Summary</h3>
+                <div id="adminUserState" class="muted">Search for a user to view current groups.</div>
+                <div id="adminUserCard" class="hidden">
+                  <div id="adminUserMetaList" class="meta-list" style="margin-bottom: 12px"></div>
+                  <div>
+                    <p style="margin: 0 0 8px 0; font-weight: 700">Current Groups</p>
+                    <div id="adminUserGroups" class="group-list"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <h3>Group Management</h3>
+                <p class="muted" style="margin-top: 0">
+                  Only Students and Staff can be managed from this portal.
+                </p>
+                <div class="actions-row">
+                  <button id="addStudentGroupBtn" class="btn accent" type="button">Add to Students</button>
+                  <button id="removeStudentGroupBtn" class="btn ghost" type="button">Remove from Students</button>
+                  <button id="addStaffGroupBtn" class="btn accent" type="button">Add to Staff</button>
+                  <button id="removeStaffGroupBtn" class="btn ghost" type="button">Remove from Staff</button>
+                </div>
+                <p id="adminGroupActionHint" class="hint"></p>
+              </div>
+            </div>
+          </section>
+
+          <section id="dashboardView" class="panel hidden">
+            <div class="toolbar">
+              <div>
+                <h2 style="margin: 0">Submissions</h2>
+                <p id="dashboardSubtitle" class="muted" style="margin: 4px 0 0 0"></p>
+              </div>
+              <div id="staffFilter" class="inline hidden">
+                <div class="field">
+                  <label for="courseFilterSelect">Course</label>
+                  <select id="courseFilterSelect">
+                    <option value="">Select a course...</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="assignmentFilterSelect">Assignment</label>
+                  <select id="assignmentFilterSelect">
+                    <option value="">All assignments</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="statusFilterSelect">Status</label>
+                  <select id="statusFilterSelect">
+                    <option value="">All statuses</option>
+                    <option value="SUBMITTED">Submitted</option>
+                    <option value="NEEDS_REVISION">Needs Revision</option>
+                    <option value="GRADED">Graded</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <p id="submissionsState" class="muted" style="margin: 0 0 10px 0"></p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr id="submissionsHeadRow"></tr>
+                </thead>
+                <tbody id="submissionsTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section id="submissionDetailView" class="panel hidden">
+            <div class="toolbar">
+              <div>
+                <h2 id="submissionDetailTitle" style="margin: 0">Submission Details</h2>
+                <p id="submissionDetailSubtitle" class="muted" style="margin: 4px 0 0 0"></p>
+              </div>
+              <div class="actions-row">
+                <button id="backToDashboardBtn" class="btn ghost" type="button">Back to Dashboard</button>
+              </div>
+            </div>
+
+            <div class="detail-grid" style="margin-bottom: 16px">
+              <div class="detail-card">
+                <h3>Summary</h3>
+                <div id="submissionMetaList" class="meta-list"></div>
+              </div>
+              <div class="detail-card">
+                <h3>Grade</h3>
+                <div id="gradeSummary" class="muted">No grade available yet.</div>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-card">
+                <h3>Versions</h3>
+                <div id="versionList" class="timeline"></div>
+              </div>
+              <div class="detail-card">
+                <h3>Comments</h3>
+                <div id="commentList" class="timeline" style="margin-bottom: 12px"></div>
+                <form id="commentForm" class="upload-form hidden">
+                  <div class="field">
+                    <label for="commentVersionSelect">Version Reference</label>
+                    <select id="commentVersionSelect">
+                      <option value="">All versions</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="commentBodyInput">Comment</label>
+                    <input id="commentBodyInput" type="text" placeholder="Add review feedback" />
+                  </div>
+                  <div class="field full">
+                    <button id="commentSubmitBtn" class="btn accent" type="submit">Add Comment</button>
+                  </div>
+                </form>
+                <p id="commentHint" class="hint"></p>
+              </div>
+            </div>
+
+            <div class="detail-grid" style="margin-top: 16px">
+              <div class="detail-card">
+                <h3>Review Actions</h3>
+                <form id="gradeForm" class="upload-form hidden">
+                  <div class="field">
+                    <label for="gradeScoreInput">Score</label>
+                    <input id="gradeScoreInput" type="number" min="0" step="0.01" />
+                  </div>
+                  <div class="field">
+                    <label for="gradeMaxScoreInput">Max Score</label>
+                    <input id="gradeMaxScoreInput" type="number" min="1" step="0.01" />
+                  </div>
+                  <div class="field">
+                    <label for="gradeStatusSelect">Grade Status</label>
+                    <select id="gradeStatusSelect">
+                      <option value="DRAFT">Draft</option>
+                      <option value="PUBLISHED">Published</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="gradeFeedbackInput">Feedback</label>
+                    <input id="gradeFeedbackInput" type="text" placeholder="Summarize feedback" />
+                  </div>
+                  <div class="field full actions-row">
+                    <button id="gradeSubmitBtn" class="btn accent" type="submit">Save Grade</button>
+                    <button id="requestRevisionBtn" class="btn ghost" type="button">Mark Needs Revision</button>
+                    <button id="markSubmittedBtn" class="btn ghost" type="button">Move Back to Submitted</button>
+                  </div>
+                </form>
+                <p id="gradeHint" class="hint"></p>
+              </div>
+
+              <div class="detail-card">
+                <h3>Student Resubmission</h3>
+                <form id="resubmitForm" class="upload-form hidden">
+                  <div class="field full">
+                    <label for="resubmitFileInput">Revised File</label>
+                    <input id="resubmitFileInput" type="file" />
+                  </div>
+                  <div class="field full">
+                    <button id="resubmitBtn" class="btn accent" type="submit">Upload Revised Version</button>
+                  </div>
+                </form>
+                <div id="resubmitState" class="muted">Resubmission is not currently available.</div>
+                <p id="resubmitHint" class="hint"></p>
+              </div>
+            </div>
+          </section>
+
+          <section id="uploadView" class="panel hidden">
+            <h2 style="margin-top: 0">Upload Assignment</h2>
+            <p class="muted">
+              This flow creates a submission, uploads your file directly to S3 using a
+              presigned URL, then confirms the upload.
+            </p>
+
+            <form id="uploadForm" class="upload-form">
+              <div class="field">
+                <label for="courseSelect">Course</label>
+                <select id="courseSelect" required>
+                  <option value="">Select a course...</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="assignmentSelect">Assignment</label>
+                <select id="assignmentSelect" required disabled>
+                  <option value="">Select an assignment...</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="titleInput">Title</label>
+                <input id="titleInput" type="text" required placeholder="Assignment 1 submission" />
+              </div>
+              <div class="field full">
+                <label for="fileInput">File</label>
+                <input id="fileInput" type="file" required />
+              </div>
+              <div class="field full">
+                <button id="uploadBtn" class="btn accent" type="submit">Upload and Confirm</button>
+              </div>
+            </form>
+            <p id="uploadHint" class="hint"></p>
+          </section>
+
+          <section id="coursesView" class="panel hidden">
+            <h2 style="margin-top: 0">Course Management</h2>
+
+            <div class="panel" style="margin-bottom: 16px">
+              <h3>Course Setup</h3>
+              <p class="muted" style="margin-top: 0">
+                Create course offerings and add assignments for courses you manage.
+              </p>
+
+              <div id="createCoursePanel" class="panel" style="margin-bottom: 16px">
+                <h4 style="margin-top: 0">Create Course</h4>
+                <p class="muted" style="margin-top: 0">
+                  Staff create course offerings by selecting a standard term from the
+                  current year or the prior year.
+                </p>
+                <form id="createCourseForm" class="upload-form">
+                  <div class="field">
+                    <label for="newCourseIdInput">Course ID</label>
+                    <input id="newCourseIdInput" type="text" required placeholder="CS101" />
+                  </div>
+                  <div class="field">
+                    <label for="newTermSelect">Term</label>
+                    <select id="newTermSelect" required>
+                      <option value="">Select a term...</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <label for="newCourseNameInput">Course Name</label>
+                    <input id="newCourseNameInput" type="text" required placeholder="Introduction to Computer Science" />
+                  </div>
+                  <div class="field full">
+                    <label for="newCourseDescInput">Description (optional)</label>
+                    <input id="newCourseDescInput" type="text" placeholder="Optional description" />
+                  </div>
+                  <div class="field full">
+                    <button id="createCourseBtn" class="btn accent" type="submit">Create Course</button>
+                  </div>
+                </form>
+                <p id="createCourseHint" class="hint"></p>
+              </div>
+
+              <div class="panel">
+                <h4 style="margin-top: 0">Assignment Setup</h4>
+                <form id="createAssignmentForm" class="upload-form">
+                  <div class="field">
+                    <label for="assignCourseSelect">Course</label>
+                    <select id="assignCourseSelect" required>
+                      <option value="">Select a course...</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="newAssignmentIdInput">Assignment ID</label>
+                    <input id="newAssignmentIdInput" type="text" required placeholder="A1" />
+                  </div>
+                  <div class="field full">
+                    <label for="newAssignmentTitleInput">Title</label>
+                    <input id="newAssignmentTitleInput" type="text" required placeholder="Lab Report 1" />
+                  </div>
+                  <div class="field">
+                    <label for="newAssignmentDueInput">Due Date (optional)</label>
+                    <input id="newAssignmentDueInput" type="datetime-local" />
+                  </div>
+                  <div class="field full">
+                    <button id="createAssignmentBtn" class="btn accent" type="submit">Add Assignment</button>
+                  </div>
+                </form>
+                <p id="createAssignmentHint" class="hint"></p>
+              </div>
+            </div>
+
+            <div class="panel" style="margin-bottom: 16px">
+              <h3>Enrollment Management</h3>
+              <p class="muted" style="margin-top: 0">
+                Assigned staff can add or remove students from course offerings.
+              </p>
+
+              <div class="panel" style="margin-bottom: 16px">
+                <h4 style="margin-top: 0">Enroll Student</h4>
+                <form id="enrollStudentForm" class="upload-form">
+                  <div class="field">
+                    <label for="enrollCourseSelect">Course</label>
+                    <select id="enrollCourseSelect" required>
+                      <option value="">Select a course...</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="enrollStudentEmailInput">Student Email</label>
+                    <input id="enrollStudentEmailInput" type="email" required placeholder="student@example.edu" />
+                  </div>
+                  <div class="field full">
+                    <button id="enrollStudentBtn" class="btn accent" type="submit">Enroll Student</button>
+                  </div>
+                </form>
+                <p id="enrollStudentHint" class="hint"></p>
+              </div>
+
+              <div class="panel">
+                <h4 style="margin-top: 0">Unenroll Student</h4>
+                <form id="unenrollStudentForm" class="upload-form">
+                  <div class="field">
+                    <label for="unenrollCourseSelect">Course</label>
+                    <select id="unenrollCourseSelect" required>
+                      <option value="">Select a course...</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="unenrollStudentEmailInput">Student Email</label>
+                    <input id="unenrollStudentEmailInput" type="email" required placeholder="student@example.edu" />
+                  </div>
+                  <div class="field full">
+                    <button id="unenrollStudentBtn" class="btn" type="submit">Unenroll Student</button>
+                  </div>
+                </form>
+                <p id="unenrollStudentHint" class="hint"></p>
+              </div>
+            </div>
+
+            <div id="assignStaffPanel" class="panel">
+              <h3>Staff Management</h3>
+              <p class="muted" style="margin-top: 0">
+                Course instructors can assign or remove staff access for each course.
+              </p>
+
+              <div class="panel" style="margin-bottom: 16px">
+                <h4 style="margin-top: 0">Assign Staff</h4>
+                <form id="assignStaffForm" class="upload-form">
+                  <div class="field">
+                    <label for="staffCourseSelect">Course</label>
+                    <select id="staffCourseSelect" required>
+                      <option value="">Select a course...</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="staffMemberEmailInput">Staff Email</label>
+                    <input id="staffMemberEmailInput" type="email" required placeholder="staff@example.edu" />
+                  </div>
+                  <div class="field">
+                    <label for="staffRoleSelect">Staff Role</label>
+                    <select id="staffRoleSelect" required>
+                      <option value="TA">TA</option>
+                      <option value="INSTRUCTOR">Instructor</option>
+                    </select>
+                  </div>
+                  <div class="field full">
+                    <button id="assignStaffBtn" class="btn accent" type="submit">Assign Staff</button>
+                  </div>
+                </form>
+                <p id="assignStaffHint" class="hint"></p>
+              </div>
+
+              <div class="panel">
+                <h4 style="margin-top: 0">Unassign Staff</h4>
+                <form id="unassignStaffForm" class="upload-form">
+                  <div class="field">
+                    <label for="unassignStaffCourseSelect">Course</label>
+                    <select id="unassignStaffCourseSelect" required>
+                      <option value="">Select a course...</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="unassignStaffEmailInput">Staff Email</label>
+                    <input id="unassignStaffEmailInput" type="email" required placeholder="staff@example.edu" />
+                  </div>
+                  <div class="field full">
+                    <button id="unassignStaffBtn" class="btn" type="submit">Unassign Staff</button>
+                  </div>
+                </form>
+                <p id="unassignStaffHint" class="hint"></p>
+              </div>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="/config.js"></script>
+    <script>
+      (function () {
+        "use strict";
+
+        const STORAGE = {
+          accessToken: "uni_portal_access_token",
+          idToken: "uni_portal_id_token",
+          refreshToken: "uni_portal_refresh_token",
+          pkceVerifier: "uni_portal_pkce_verifier",
+          oauthState: "uni_portal_oauth_state",
+          staffCourseId: "uni_portal_staff_course_id",
+          postAuthRoute: "uni_portal_post_auth_route"
+        };
+
+        const ROLE_ORDER = ["Admin", "Staff", "Students"];
+        const STANDARD_TERM_SEASONS = ["SPRING", "SUMMER", "FALL", "WINTER"];
+
+        const state = {
+          config: null,
+          accessToken: "",
+          idToken: "",
+          refreshToken: "",
+          claims: null,
+          email: "",
+          groups: [],
+          primaryGroup: "",
+          submissions: [],
+          allSubmissions: [],
+          courses: [],
+          assignments: [],
+          dashboardAssignments: [],
+          standardTerms: [],
+          coursesLoaded: false,
+          submissionDetail: null,
+          adminUser: null
+        };
+
+        const els = {
+          userEmail: document.getElementById("userEmail"),
+          roleBadge: document.getElementById("roleBadge"),
+          signOutBtn: document.getElementById("signOutBtn"),
+          signInBtn: document.getElementById("signInBtn"),
+          sideNav: document.getElementById("sideNav"),
+          navButtons: Array.from(document.querySelectorAll(".nav-btn")),
+          toast: document.getElementById("toast"),
+          landingView: document.getElementById("landingView"),
+          ungroupedView: document.getElementById("ungroupedView"),
+          adminDeniedView: document.getElementById("adminDeniedView"),
+          adminView: document.getElementById("adminView"),
+          dashboardView: document.getElementById("dashboardView"),
+          submissionDetailView: document.getElementById("submissionDetailView"),
+          uploadView: document.getElementById("uploadView"),
+          coursesView: document.getElementById("coursesView"),
+          adminLookupForm: document.getElementById("adminLookupForm"),
+          adminUserEmailInput: document.getElementById("adminUserEmailInput"),
+          adminLookupBtn: document.getElementById("adminLookupBtn"),
+          adminLookupHint: document.getElementById("adminLookupHint"),
+          adminUserState: document.getElementById("adminUserState"),
+          adminUserCard: document.getElementById("adminUserCard"),
+          adminUserMetaList: document.getElementById("adminUserMetaList"),
+          adminUserGroups: document.getElementById("adminUserGroups"),
+          adminGroupActionHint: document.getElementById("adminGroupActionHint"),
+          addStudentGroupBtn: document.getElementById("addStudentGroupBtn"),
+          removeStudentGroupBtn: document.getElementById("removeStudentGroupBtn"),
+          addStaffGroupBtn: document.getElementById("addStaffGroupBtn"),
+          removeStaffGroupBtn: document.getElementById("removeStaffGroupBtn"),
+          dashboardSubtitle: document.getElementById("dashboardSubtitle"),
+          submissionsState: document.getElementById("submissionsState"),
+          submissionsHeadRow: document.getElementById("submissionsHeadRow"),
+          submissionsTableBody: document.getElementById("submissionsTableBody"),
+          staffFilter: document.getElementById("staffFilter"),
+          courseFilterSelect: document.getElementById("courseFilterSelect"),
+          assignmentFilterSelect: document.getElementById("assignmentFilterSelect"),
+          statusFilterSelect: document.getElementById("statusFilterSelect"),
+          backToDashboardBtn: document.getElementById("backToDashboardBtn"),
+          submissionDetailTitle: document.getElementById("submissionDetailTitle"),
+          submissionDetailSubtitle: document.getElementById("submissionDetailSubtitle"),
+          submissionMetaList: document.getElementById("submissionMetaList"),
+          gradeSummary: document.getElementById("gradeSummary"),
+          versionList: document.getElementById("versionList"),
+          commentList: document.getElementById("commentList"),
+          commentForm: document.getElementById("commentForm"),
+          commentVersionSelect: document.getElementById("commentVersionSelect"),
+          commentBodyInput: document.getElementById("commentBodyInput"),
+          commentHint: document.getElementById("commentHint"),
+          gradeForm: document.getElementById("gradeForm"),
+          gradeScoreInput: document.getElementById("gradeScoreInput"),
+          gradeMaxScoreInput: document.getElementById("gradeMaxScoreInput"),
+          gradeStatusSelect: document.getElementById("gradeStatusSelect"),
+          gradeFeedbackInput: document.getElementById("gradeFeedbackInput"),
+          gradeHint: document.getElementById("gradeHint"),
+          requestRevisionBtn: document.getElementById("requestRevisionBtn"),
+          markSubmittedBtn: document.getElementById("markSubmittedBtn"),
+          resubmitForm: document.getElementById("resubmitForm"),
+          resubmitFileInput: document.getElementById("resubmitFileInput"),
+          resubmitState: document.getElementById("resubmitState"),
+          resubmitHint: document.getElementById("resubmitHint"),
+          uploadForm: document.getElementById("uploadForm"),
+          courseSelect: document.getElementById("courseSelect"),
+          assignmentSelect: document.getElementById("assignmentSelect"),
+          titleInput: document.getElementById("titleInput"),
+          fileInput: document.getElementById("fileInput"),
+          uploadBtn: document.getElementById("uploadBtn"),
+          uploadHint: document.getElementById("uploadHint"),
+          createCoursePanel: document.getElementById("createCoursePanel"),
+          assignStaffPanel: document.getElementById("assignStaffPanel"),
+          createCourseForm: document.getElementById("createCourseForm"),
+          createAssignmentForm: document.getElementById("createAssignmentForm"),
+          enrollStudentForm: document.getElementById("enrollStudentForm"),
+          unenrollStudentForm: document.getElementById("unenrollStudentForm"),
+          assignStaffForm: document.getElementById("assignStaffForm"),
+          unassignStaffForm: document.getElementById("unassignStaffForm"),
+          assignCourseSelect: document.getElementById("assignCourseSelect"),
+          enrollCourseSelect: document.getElementById("enrollCourseSelect"),
+          unenrollCourseSelect: document.getElementById("unenrollCourseSelect"),
+          staffCourseSelect: document.getElementById("staffCourseSelect"),
+          unassignStaffCourseSelect: document.getElementById("unassignStaffCourseSelect"),
+          newCourseIdInput: document.getElementById("newCourseIdInput"),
+          newTermSelect: document.getElementById("newTermSelect"),
+          newCourseNameInput: document.getElementById("newCourseNameInput"),
+          newCourseDescInput: document.getElementById("newCourseDescInput"),
+          createCourseHint: document.getElementById("createCourseHint"),
+          newAssignmentIdInput: document.getElementById("newAssignmentIdInput"),
+          newAssignmentTitleInput: document.getElementById("newAssignmentTitleInput"),
+          newAssignmentDueInput: document.getElementById("newAssignmentDueInput"),
+          createAssignmentHint: document.getElementById("createAssignmentHint"),
+          enrollStudentEmailInput: document.getElementById("enrollStudentEmailInput"),
+          enrollStudentHint: document.getElementById("enrollStudentHint"),
+          unenrollStudentEmailInput: document.getElementById("unenrollStudentEmailInput"),
+          unenrollStudentHint: document.getElementById("unenrollStudentHint"),
+          staffMemberEmailInput: document.getElementById("staffMemberEmailInput"),
+          staffRoleSelect: document.getElementById("staffRoleSelect"),
+          assignStaffHint: document.getElementById("assignStaffHint"),
+          unassignStaffEmailInput: document.getElementById("unassignStaffEmailInput"),
+          unassignStaffHint: document.getElementById("unassignStaffHint")
+        };
+
+        function setHidden(el, hidden) {
+          if (!el) return;
+          el.classList.toggle("hidden", hidden);
+        }
+
+        function normalizeApiUrl(url) {
+          return (url || "").replace(/\/+$/, "");
+        }
+
+        function showToast(message, type) {
+          if (!message) {
+            setHidden(els.toast, true);
+            els.toast.textContent = "";
+            els.toast.className = "toast hidden";
+            return;
+          }
+          els.toast.textContent = message;
+          els.toast.className = "toast " + (type || "info");
+          setHidden(els.toast, false);
+        }
+
+        function readConfig() {
+          const cfg = window.__UNI_PORTAL_CONFIG__;
+          if (!cfg) {
+            throw new Error("Missing runtime config. Run deploy-placeholder.sh to generate config.js.");
+          }
+
+          const required = ["cognitoClientId", "cognitoAuthDomain", "callbackUrl", "apiUrl", "region"];
+          for (const key of required) {
+            if (!cfg[key]) {
+              throw new Error("Missing config key: " + key + ". Regenerate config.js.");
+            }
+          }
+
+          return {
+            region: cfg.region,
+            cognitoClientId: cfg.cognitoClientId,
+            cognitoAuthDomain: String(cfg.cognitoAuthDomain).replace(/\/+$/, ""),
+            callbackUrl: cfg.callbackUrl,
+            apiUrl: normalizeApiUrl(cfg.apiUrl)
+          };
+        }
+
+        function decodeBase64Url(input) {
+          const normalized = input.replace(/-/g, "+").replace(/_/g, "/");
+          const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
+          return atob(padded);
+        }
+
+        function decodeJwt(token) {
+          const parts = token.split(".");
+          if (parts.length < 2) throw new Error("Invalid JWT.");
+          const payload = decodeBase64Url(parts[1]);
+          return JSON.parse(payload);
+        }
+
+        function parseGroups(claimGroups) {
+          if (Array.isArray(claimGroups)) return claimGroups.filter(Boolean);
+          if (!claimGroups) return [];
+          return String(claimGroups)
+            .split(",")
+            .map(function (g) {
+              return g.trim();
+            })
+            .filter(Boolean);
+        }
+
+        function resolvePrimaryGroup(groups) {
+          for (const role of ROLE_ORDER) {
+            if (groups.includes(role)) return role;
+          }
+          return "";
+        }
+
+        function isStaff() {
+          return state.groups.includes("Staff");
+        }
+
+        function isAdmin() {
+          return state.groups.includes("Admin");
+        }
+
+        function isStudent() {
+          return state.groups.includes("Students");
+        }
+
+        function clearSession() {
+          sessionStorage.removeItem(STORAGE.accessToken);
+          sessionStorage.removeItem(STORAGE.idToken);
+          sessionStorage.removeItem(STORAGE.refreshToken);
+          sessionStorage.removeItem(STORAGE.pkceVerifier);
+          sessionStorage.removeItem(STORAGE.oauthState);
+          sessionStorage.removeItem(STORAGE.postAuthRoute);
+          state.accessToken = "";
+          state.idToken = "";
+          state.refreshToken = "";
+          state.claims = null;
+          state.email = "";
+          state.groups = [];
+          state.primaryGroup = "";
+          state.submissions = [];
+          state.allSubmissions = [];
+          state.courses = [];
+          state.assignments = [];
+          state.dashboardAssignments = [];
+          state.standardTerms = [];
+          state.coursesLoaded = false;
+          state.submissionDetail = null;
+          state.adminUser = null;
+        }
+
+        function applySessionFromStorage() {
+          state.accessToken = sessionStorage.getItem(STORAGE.accessToken) || "";
+          state.idToken = sessionStorage.getItem(STORAGE.idToken) || "";
+          state.refreshToken = sessionStorage.getItem(STORAGE.refreshToken) || "";
+          if (!state.accessToken || !state.idToken) return false;
+
+          try {
+            state.claims = decodeJwt(state.idToken);
+          } catch (_error) {
+            clearSession();
+            return false;
+          }
+
+          state.email = state.claims.email || "Unknown user";
+          state.groups = parseGroups(state.claims["cognito:groups"]);
+          state.primaryGroup = resolvePrimaryGroup(state.groups);
+          return true;
+        }
+
+        function setAuthChrome() {
+          const isAuthed = Boolean(state.accessToken && state.idToken);
+          setHidden(els.signOutBtn, !isAuthed);
+          setHidden(els.userEmail, !isAuthed);
+          setHidden(els.roleBadge, !isAuthed);
+
+          if (isAuthed) {
+            els.userEmail.textContent = state.email || "Unknown user";
+            const badgeMap = {
+              Admin: "admin",
+              Students: "student",
+              Staff: "instructors"
+            };
+            const badgeClass = badgeMap[state.primaryGroup] || "ungrouped";
+            els.roleBadge.className = "badge " + badgeClass;
+            els.roleBadge.textContent = state.primaryGroup || "Ungrouped";
+          }
+        }
+
+        function randomToken(bytes) {
+          const arr = new Uint8Array(bytes);
+          crypto.getRandomValues(arr);
+          let out = "";
+          for (const n of arr) out += String.fromCharCode(n);
+          return btoa(out).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+        }
+
+        async function createPkceChallenge(verifier) {
+          const data = new TextEncoder().encode(verifier);
+          const digest = await crypto.subtle.digest("SHA-256", data);
+          let str = "";
+          for (const n of new Uint8Array(digest)) str += String.fromCharCode(n);
+          return btoa(str).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+        }
+
+        async function startSignIn() {
+          try {
+            const verifier = randomToken(64);
+            const challenge = await createPkceChallenge(verifier);
+            const oauthState = randomToken(24);
+
+            sessionStorage.setItem(STORAGE.pkceVerifier, verifier);
+            sessionStorage.setItem(STORAGE.oauthState, oauthState);
+            sessionStorage.setItem(STORAGE.postAuthRoute, getRoute());
+
+            const params = new URLSearchParams({
+              response_type: "code",
+              client_id: state.config.cognitoClientId,
+              redirect_uri: state.config.callbackUrl,
+              scope: "openid email profile",
+              code_challenge_method: "S256",
+              code_challenge: challenge,
+              state: oauthState
+            });
+
+            window.location.assign(state.config.cognitoAuthDomain + "/oauth2/authorize?" + params.toString());
+          } catch (error) {
+            showToast(error.message || "Unable to start sign-in flow.", "error");
+          }
+        }
+
+        async function exchangeAuthorizationCode(code, returnedState) {
+          const verifier = sessionStorage.getItem(STORAGE.pkceVerifier);
+          const expectedState = sessionStorage.getItem(STORAGE.oauthState);
+          if (!verifier) throw new Error("Missing PKCE verifier in session.");
+          if (!returnedState || returnedState !== expectedState) throw new Error("OAuth state mismatch.");
+
+          const tokenUrl = state.config.cognitoAuthDomain + "/oauth2/token";
+          const body = new URLSearchParams({
+            grant_type: "authorization_code",
+            client_id: state.config.cognitoClientId,
+            redirect_uri: state.config.callbackUrl,
+            code: code,
+            code_verifier: verifier
+          });
+
+          const response = await fetch(tokenUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: body.toString()
+          });
+
+          const payload = await response.json().catch(function () {
+            return {};
+          });
+          if (!response.ok) {
+            const reason = payload.error_description || payload.error || "Token exchange failed.";
+            throw new Error(reason);
+          }
+
+          if (!payload.access_token || !payload.id_token) {
+            throw new Error("Token response is missing required fields.");
+          }
+
+          sessionStorage.setItem(STORAGE.accessToken, payload.access_token);
+          sessionStorage.setItem(STORAGE.idToken, payload.id_token);
+          if (payload.refresh_token) {
+            sessionStorage.setItem(STORAGE.refreshToken, payload.refresh_token);
+          }
+          sessionStorage.removeItem(STORAGE.pkceVerifier);
+          sessionStorage.removeItem(STORAGE.oauthState);
+        }
+
+        async function handleAuthCallbackIfPresent() {
+          const url = new URL(window.location.href);
+          const code = url.searchParams.get("code");
+          const stateParam = url.searchParams.get("state");
+          const authError = url.searchParams.get("error");
+
+          if (authError) {
+            clearSession();
+            throw new Error("Authentication failed: " + authError);
+          }
+
+          if (!code) return false;
+          await exchangeAuthorizationCode(code, stateParam);
+
+          const cleanUrl = buildUrlForRoute(sessionStorage.getItem(STORAGE.postAuthRoute) || getRoute());
+          sessionStorage.removeItem(STORAGE.postAuthRoute);
+          window.history.replaceState({}, document.title, cleanUrl);
+          return true;
+        }
+
+        async function apiRequest(path, options) {
+          const opts = options || {};
+          const method = opts.method || "GET";
+          const headers = Object.assign({}, opts.headers || {});
+          let body = opts.body;
+          if (body !== undefined && body !== null) {
+            headers["Content-Type"] = "application/json";
+            body = JSON.stringify(body);
+          }
+          headers.Authorization = "Bearer " + state.accessToken;
+
+          const response = await fetch(state.config.apiUrl + path, {
+            method: method,
+            headers: headers,
+            body: body
+          });
+
+          let payload = {};
+          const contentType = response.headers.get("content-type") || "";
+          if (contentType.includes("application/json")) {
+            payload = await response.json().catch(function () {
+              return {};
+            });
+          } else {
+            const text = await response.text().catch(function () {
+              return "";
+            });
+            payload = text ? { error: text } : {};
+          }
+
+          if (response.status === 401) {
+            clearSession();
+            render();
+            throw new Error("Session expired. Please sign in again.");
+          }
+
+          if (!response.ok) {
+            const error = new Error(payload.error || payload.message || ("Request failed (" + response.status + ")"));
+            error.status = response.status;
+            error.code = payload.code || "";
+            error.payload = payload;
+            throw error;
+          }
+
+          return payload;
+        }
+
+        function getFriendlyStaffAssignError(error) {
+          const message = String((error && error.message) || "");
+          if (error && error.status === 409) {
+            if (message.includes("already assigned")) {
+              return "That staff user is already assigned to this course.";
+            }
+          }
+          return message || "Unable to assign staff.";
+        }
+
+        function getFriendlyStaffUnassignError(error) {
+          const message = String((error && error.message) || "");
+          if (error && error.status === 409) {
+            if (message.includes("At least one instructor must remain")) {
+              return "You can't remove the only instructor from a course. Assign another instructor first.";
+            }
+          }
+          return message || "Unable to unassign staff.";
+        }
+
+        function formatDate(iso) {
+          if (!iso) return "";
+          const date = new Date(iso);
+          if (Number.isNaN(date.getTime())) return String(iso);
+          return date.toLocaleString();
+        }
+
+        function buildCourseOptionValue(courseId, termId) {
+          return String(courseId || "") + "::" + String(termId || "");
+        }
+
+        function parseCourseSelection(value) {
+          const parts = String(value || "").split("::");
+          return {
+            courseId: (parts[0] || "").trim(),
+            termId: (parts[1] || "").trim()
+          };
+        }
+
+        function buildCourseLabel(course) {
+          const pieces = [course.courseId || "", course.termId || ""];
+          if (course.name) pieces.push(course.name);
+          return pieces.filter(Boolean).join(" - ");
+        }
+
+        function getRouteSubmissionId(route) {
+          const match = String(route || "").match(/^submissions\/([^/?#]+)$/);
+          return match ? decodeURIComponent(match[1]) : "";
+        }
+
+        function formatStatusLabel(status) {
+          return String(status || "")
+            .replace(/_/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, function (char) {
+              return char.toUpperCase();
+            });
+        }
+
+        function getStatusClass(status) {
+          return String(status || "").toLowerCase().replace(/_/g, "-");
+        }
+
+        function findCourseByOffering(courseId, termId) {
+          return (state.courses || []).find(function (course) {
+            return String(course.courseId || "") === String(courseId || "")
+              && String(course.termId || "") === String(termId || "");
+          }) || null;
+        }
+
+        function getCourseLabelForSubmission(item) {
+          const course = findCourseByOffering(item.courseId, item.termId);
+          if (course) return buildCourseLabel(course);
+          return [item.courseId || "", item.termId || ""].filter(Boolean).join(" - ");
+        }
+
+        function getSubmissionDisplayTitle(item) {
+          return item.title || (item.assignmentId ? (item.assignmentId + " Submission") : (item.submissionId || "Submission"));
+        }
+
+        function setSimpleOptions(selectEl, items, placeholder) {
+          if (!selectEl) return;
+          const currentValue = selectEl.value;
+          selectEl.innerHTML = "";
+
+          const placeholderOption = document.createElement("option");
+          placeholderOption.value = "";
+          placeholderOption.textContent = placeholder || "Select an option...";
+          selectEl.appendChild(placeholderOption);
+
+          items.forEach(function (item) {
+            const option = document.createElement("option");
+            option.value = item.value;
+            option.textContent = item.label;
+            selectEl.appendChild(option);
+          });
+
+          selectEl.value = items.some(function (item) {
+            return item.value === currentValue;
+          }) ? currentValue : "";
+          selectEl.disabled = items.length === 0;
+        }
+
+        function populateStaffAssignmentFilter() {
+          const assignments = Array.isArray(state.dashboardAssignments) ? state.dashboardAssignments : [];
+          setSimpleOptions(
+            els.assignmentFilterSelect,
+            assignments.map(function (assignment) {
+              return {
+                value: assignment.assignmentId || "",
+                label: assignment.title
+                  ? (assignment.assignmentId + " - " + assignment.title)
+                  : (assignment.assignmentId || "")
+              };
+            }),
+            "All assignments"
+          );
+          if (!assignments.length) {
+            els.assignmentFilterSelect.disabled = true;
+          }
+        }
+
+        function setSelectOptions(selectEl, items, placeholder) {
+          if (!selectEl) return;
+          const currentValue = selectEl.value;
+          selectEl.innerHTML = "";
+
+          const placeholderOption = document.createElement("option");
+          placeholderOption.value = "";
+          placeholderOption.textContent = placeholder || "Select an option...";
+          selectEl.appendChild(placeholderOption);
+
+          for (const item of items) {
+            const option = document.createElement("option");
+            option.value = buildCourseOptionValue(item.courseId, item.termId);
+            option.textContent = buildCourseLabel(item);
+            selectEl.appendChild(option);
+          }
+
+          if (items.some(function (item) {
+            return buildCourseOptionValue(item.courseId, item.termId) === currentValue;
+          })) {
+            selectEl.value = currentValue;
+          } else {
+            selectEl.value = "";
+          }
+
+          selectEl.disabled = items.length === 0;
+        }
+
+        function getStandardTerms() {
+          const currentYear = new Date().getFullYear();
+          const years = [currentYear, currentYear - 1];
+          const options = [];
+
+          for (const year of years) {
+            for (const season of STANDARD_TERM_SEASONS) {
+              options.push({
+                value: year + "-" + season,
+                label: year + " " + season.charAt(0) + season.slice(1).toLowerCase()
+              });
+            }
+          }
+
+          return options;
+        }
+
+        function populateStandardTermSelect() {
+          if (!els.newTermSelect) return;
+
+          const options = Array.isArray(state.standardTerms) ? state.standardTerms : [];
+          const currentValue = els.newTermSelect.value;
+          els.newTermSelect.innerHTML = "";
+
+          const placeholderOption = document.createElement("option");
+          placeholderOption.value = "";
+          placeholderOption.textContent = "Select a term...";
+          els.newTermSelect.appendChild(placeholderOption);
+
+          for (const optionDef of options) {
+            const option = document.createElement("option");
+            option.value = optionDef.value;
+            option.textContent = optionDef.label;
+            els.newTermSelect.appendChild(option);
+          }
+
+          if (options.some(function (item) {
+            return item.value === currentValue;
+          })) {
+            els.newTermSelect.value = currentValue;
+          } else {
+            els.newTermSelect.value = "";
+          }
+
+          els.newTermSelect.disabled = options.length === 0;
+        }
+
+        function setAssignmentOptions(assignments, placeholder) {
+          els.assignmentSelect.innerHTML = "";
+          const placeholderOption = document.createElement("option");
+          placeholderOption.value = "";
+          placeholderOption.textContent = placeholder || "Select an assignment...";
+          els.assignmentSelect.appendChild(placeholderOption);
+
+          for (const assignment of assignments) {
+            const option = document.createElement("option");
+            option.value = assignment.assignmentId || "";
+            option.textContent = assignment.title
+              ? assignment.assignmentId + " - " + assignment.title
+              : (assignment.assignmentId || "");
+            els.assignmentSelect.appendChild(option);
+          }
+
+          els.assignmentSelect.disabled = assignments.length === 0;
+          els.uploadBtn.disabled = assignments.length === 0;
+        }
+
+        function populateCourseControls() {
+          const courses = Array.isArray(state.courses) ? state.courses : [];
+          if (isStudent()) {
+            setSelectOptions(els.courseSelect, courses, "Select a course...");
+            if (!courses.length) {
+              els.assignmentSelect.disabled = true;
+              els.uploadBtn.disabled = true;
+              els.uploadHint.textContent = "You are not enrolled in any courses. Contact your instructor.";
+            } else {
+              els.uploadBtn.disabled = false;
+            }
+          }
+
+          if (isStaff()) {
+            setSelectOptions(els.courseFilterSelect, courses, "Select a course...");
+            setSelectOptions(els.assignCourseSelect, courses, "Select a course...");
+            setSelectOptions(els.enrollCourseSelect, courses, "Select a course...");
+            setSelectOptions(els.unenrollCourseSelect, courses, "Select a course...");
+            setSelectOptions(els.staffCourseSelect, courses, "Select a course...");
+            setSelectOptions(els.unassignStaffCourseSelect, courses, "Select a course...");
+          }
+        }
+
+        async function loadAvailableCourses(forceRefresh) {
+          if (state.coursesLoaded && !forceRefresh) {
+            populateCourseControls();
+            return state.courses;
+          }
+
+          const payload = await apiRequest("/courses");
+          state.courses = Array.isArray(payload.courses) ? payload.courses : [];
+          state.coursesLoaded = true;
+          populateCourseControls();
+          return state.courses;
+        }
+
+        async function loadAssignmentsForCourse(courseId, termId) {
+          els.assignmentSelect.disabled = true;
+          els.uploadBtn.disabled = true;
+          els.assignmentSelect.innerHTML = '<option value="">Loading assignments...</option>';
+
+          const payload = await apiRequest(
+            "/courses/" + encodeURIComponent(courseId)
+            + "/terms/" + encodeURIComponent(termId)
+            + "/assignments"
+          );
+
+          state.assignments = Array.isArray(payload.assignments)
+            ? payload.assignments.filter(function (item) {
+                return item.active !== false;
+              })
+            : [];
+
+          if (!state.assignments.length) {
+            setAssignmentOptions([], "No active assignments");
+            els.uploadHint.textContent = "No active assignments are available for the selected course.";
+            return;
+          }
+
+          setAssignmentOptions(state.assignments, "Select an assignment...");
+          els.uploadHint.textContent = "";
+        }
+
+        async function loadAssignmentsForDashboardCourse(courseId, termId) {
+          if (!courseId || !termId) {
+            state.dashboardAssignments = [];
+            populateStaffAssignmentFilter();
+            return;
+          }
+          const payload = await apiRequest(
+            "/courses/" + encodeURIComponent(courseId)
+            + "/terms/" + encodeURIComponent(termId)
+            + "/assignments"
+          );
+          state.dashboardAssignments = Array.isArray(payload.assignments) ? payload.assignments : [];
+          populateStaffAssignmentFilter();
+        }
+
+        function renderTableHeaders(staffMode) {
+          const cols = staffMode
+            ? ["Submission", "Student", "Assignment", "Status", "Updated At"]
+            : ["Submission", "Assignment", "Course", "Status", "Updated At"];
+          els.submissionsHeadRow.innerHTML = "";
+          for (const col of cols) {
+            const th = document.createElement("th");
+            th.textContent = col;
+            els.submissionsHeadRow.appendChild(th);
+          }
+        }
+
+        function renderSubmissionsRows(staffMode) {
+          els.submissionsTableBody.innerHTML = "";
+          if (!state.submissions.length) return;
+          for (const item of state.submissions) {
+            const tr = document.createElement("tr");
+            const titleCell = document.createElement("td");
+            const openBtn = document.createElement("button");
+            openBtn.type = "button";
+            openBtn.className = "link-btn";
+            openBtn.textContent = getSubmissionDisplayTitle(item);
+            openBtn.setAttribute("data-open-submission", item.submissionId || "");
+            titleCell.appendChild(openBtn);
+            tr.appendChild(titleCell);
+
+            const secondCell = document.createElement("td");
+            secondCell.textContent = staffMode
+              ? (item.studentEmail || item.studentId || "")
+              : (item.assignmentId || "");
+            tr.appendChild(secondCell);
+
+            const thirdCell = document.createElement("td");
+            thirdCell.textContent = staffMode
+              ? (item.assignmentId || "")
+              : getCourseLabelForSubmission(item);
+            tr.appendChild(thirdCell);
+
+            const statusCell = document.createElement("td");
+            const pill = document.createElement("span");
+            pill.className = "status-pill " + getStatusClass(item.status);
+            pill.textContent = formatStatusLabel(item.status || "");
+            statusCell.appendChild(pill);
+            tr.appendChild(statusCell);
+
+            const timeCell = document.createElement("td");
+            timeCell.textContent = formatDate(item.updatedAt || item.createdAt);
+            tr.appendChild(timeCell);
+            els.submissionsTableBody.appendChild(tr);
+          }
+        }
+
+        function applyStaffSubmissionFilters() {
+          const selectedAssignment = (els.assignmentFilterSelect.value || "").trim();
+          const selectedStatus = (els.statusFilterSelect.value || "").trim();
+          state.submissions = (state.allSubmissions || []).filter(function (item) {
+            const assignmentMatch = !selectedAssignment || String(item.assignmentId || "") === selectedAssignment;
+            const statusMatch = !selectedStatus || String(item.status || "") === selectedStatus;
+            return assignmentMatch && statusMatch;
+          });
+          renderTableHeaders(true);
+          renderSubmissionsRows(true);
+          if (els.courseFilterSelect.value) {
+            const courseLabel = els.courseFilterSelect.options[els.courseFilterSelect.selectedIndex].textContent;
+            els.submissionsState.textContent = state.submissions.length
+              ? "Showing " + state.submissions.length + " submission(s) for " + courseLabel + "."
+              : "No submissions found for " + courseLabel + ".";
+          }
+        }
+
+        async function loadStudentSubmissions() {
+          els.submissionsState.textContent = "Loading your submissions...";
+          const payload = await apiRequest("/submissions");
+          state.submissions = Array.isArray(payload.submissions) ? payload.submissions : [];
+          state.allSubmissions = state.submissions.slice();
+          renderTableHeaders(false);
+          renderSubmissionsRows(false);
+          els.submissionsState.textContent = state.submissions.length
+            ? "Showing " + state.submissions.length + " submission(s)."
+            : "No submissions yet.";
+        }
+
+        async function loadStaffSubmissions() {
+          const selection = parseCourseSelection(els.courseFilterSelect.value);
+          if (!selection.courseId || !selection.termId) {
+            els.submissionsState.textContent = "Select a course to load submissions.";
+            state.submissions = [];
+            state.allSubmissions = [];
+            state.dashboardAssignments = [];
+            els.assignmentFilterSelect.value = "";
+            els.statusFilterSelect.value = "";
+            populateStaffAssignmentFilter();
+            renderTableHeaders(true);
+            renderSubmissionsRows(true);
+            return;
+          }
+
+          const courseLabel = els.courseFilterSelect.options[els.courseFilterSelect.selectedIndex].textContent;
+          sessionStorage.setItem(STORAGE.staffCourseId, els.courseFilterSelect.value);
+          els.submissionsState.textContent = "Loading submissions for " + courseLabel + "...";
+          await loadAssignmentsForDashboardCourse(selection.courseId, selection.termId);
+          const payload = await apiRequest(
+            "/submissions?courseId=" + encodeURIComponent(selection.courseId)
+            + "&termId=" + encodeURIComponent(selection.termId)
+          );
+          state.allSubmissions = Array.isArray(payload.submissions) ? payload.submissions : [];
+          applyStaffSubmissionFilters();
+          els.submissionsState.textContent = state.submissions.length
+            ? "Showing " + state.submissions.length + " submission(s) for " + courseLabel + "."
+            : "No submissions found for " + courseLabel + ".";
+        }
+
+        function buildMetaItem(label, value) {
+          const wrap = document.createElement("div");
+          wrap.className = "meta-item";
+          const key = document.createElement("span");
+          key.textContent = label;
+          const val = document.createElement("strong");
+          val.textContent = value || "—";
+          wrap.appendChild(key);
+          wrap.appendChild(val);
+          return wrap;
+        }
+
+        function populateCommentVersionOptions(versions) {
+          setSimpleOptions(
+            els.commentVersionSelect,
+            (versions || []).map(function (version) {
+              return {
+                value: String(version.versionNumber || ""),
+                label: "Version " + String(version.versionNumber || "")
+              };
+            }),
+            "All versions"
+          );
+          els.commentVersionSelect.disabled = !(versions || []).length;
+        }
+
+        function renderSubmissionDetail() {
+          const detail = state.submissionDetail;
+          if (!detail || !detail.submission) return;
+
+          const submission = detail.submission;
+          const student = detail.student || {};
+          const assignment = detail.assignment || {};
+          const versions = Array.isArray(detail.versions) ? detail.versions : [];
+          const comments = Array.isArray(detail.comments) ? detail.comments : [];
+          const grade = detail.grade || null;
+          const allowed = detail.allowedActions || {};
+
+          els.submissionDetailTitle.textContent = getSubmissionDisplayTitle(submission);
+          els.submissionDetailSubtitle.textContent = getCourseLabelForSubmission(submission);
+
+          els.submissionMetaList.innerHTML = "";
+          [
+            ["Assignment", assignment.title ? (submission.assignmentId + " - " + assignment.title) : (submission.assignmentId || "")],
+            ["Status", formatStatusLabel(submission.status)],
+            ["Student", student.displayName || student.email || submission.studentId || ""],
+            ["Current Version", String(submission.currentVersion || 1)],
+            ["Updated", formatDate(submission.updatedAt || submission.createdAt)],
+            ["Submission ID", submission.submissionId || ""]
+          ].forEach(function (pair) {
+            els.submissionMetaList.appendChild(buildMetaItem(pair[0], pair[1]));
+          });
+
+          if (grade) {
+            els.gradeSummary.innerHTML = "";
+            els.gradeSummary.appendChild(buildMetaItem("Score", String(grade.score) + " / " + String(grade.maxScore)));
+            els.gradeSummary.appendChild(buildMetaItem("Status", formatStatusLabel(grade.status)));
+            els.gradeSummary.appendChild(buildMetaItem("Feedback", grade.feedback || "No feedback"));
+          } else {
+            els.gradeSummary.textContent = "No grade available yet.";
+          }
+
+          els.versionList.innerHTML = "";
+          if (!versions.length) {
+            els.versionList.textContent = "No uploaded versions found.";
+          } else {
+            versions.forEach(function (version) {
+              const item = document.createElement("div");
+              item.className = "timeline-item";
+
+              const meta = document.createElement("div");
+              meta.className = "timeline-meta";
+              const metaTitle = document.createElement("strong");
+              metaTitle.textContent = "Version " + String(version.versionNumber || "");
+              const metaTime = document.createElement("span");
+              metaTime.textContent = formatDate(version.uploadedAt);
+              meta.appendChild(metaTitle);
+              meta.appendChild(metaTime);
+              item.appendChild(meta);
+
+              const fileLine = document.createElement("p");
+              fileLine.style.margin = "0 0 10px 0";
+              fileLine.textContent = version.originalFilename || "Uploaded file";
+              item.appendChild(fileLine);
+
+              const button = document.createElement("button");
+              button.type = "button";
+              button.className = "btn ghost";
+              button.textContent = "Download";
+              button.setAttribute("data-download-submission", submission.submissionId || "");
+              button.setAttribute("data-download-version", String(version.versionNumber || ""));
+              item.appendChild(button);
+              els.versionList.appendChild(item);
+            });
+          }
+
+          els.commentList.innerHTML = "";
+          if (!comments.length) {
+            els.commentList.textContent = "No comments yet.";
+          } else {
+            comments.forEach(function (comment) {
+              const item = document.createElement("div");
+              item.className = "timeline-item";
+              const meta = document.createElement("div");
+              meta.className = "timeline-meta";
+              const authorName = comment.authorDisplayName || comment.authorEmail || comment.authorId || "Reviewer";
+              const authorStrong = document.createElement("strong");
+              authorStrong.textContent = authorName;
+              const authorMeta = document.createElement("span");
+              authorMeta.textContent = (comment.authorRoleLabel || "Staff") + " · " + formatDate(comment.createdAt);
+              meta.appendChild(authorStrong);
+              meta.appendChild(authorMeta);
+              item.appendChild(meta);
+
+              if (comment.versionRef) {
+                const versionTag = document.createElement("p");
+                versionTag.className = "muted";
+                versionTag.style.margin = "0 0 8px 0";
+                versionTag.textContent = "Version " + comment.versionRef;
+                item.appendChild(versionTag);
+              }
+
+              const body = document.createElement("p");
+              body.style.margin = "0";
+              body.textContent = comment.body || "";
+              item.appendChild(body);
+              els.commentList.appendChild(item);
+            });
+          }
+
+          populateCommentVersionOptions(versions);
+
+          setHidden(els.commentForm, !allowed.canComment);
+          setHidden(els.gradeForm, !allowed.canGrade);
+          setHidden(els.resubmitForm, !allowed.canResubmit);
+
+          els.commentHint.textContent = "";
+          els.gradeHint.textContent = "";
+          els.resubmitHint.textContent = "";
+          els.commentBodyInput.value = "";
+          els.resubmitFileInput.value = "";
+
+          if (grade) {
+            els.gradeScoreInput.value = grade.score != null ? grade.score : "";
+            els.gradeMaxScoreInput.value = grade.maxScore != null ? grade.maxScore : "";
+            els.gradeStatusSelect.value = grade.status || "DRAFT";
+            els.gradeFeedbackInput.value = grade.feedback || "";
+          } else {
+            els.gradeScoreInput.value = "";
+            els.gradeMaxScoreInput.value = "";
+            els.gradeStatusSelect.value = "DRAFT";
+            els.gradeFeedbackInput.value = "";
+          }
+
+          els.requestRevisionBtn.disabled = !allowed.canRequestRevision;
+          els.markSubmittedBtn.disabled = !allowed.canRequestRevision || submission.status !== "NEEDS_REVISION";
+          els.resubmitState.textContent = allowed.canResubmit
+            ? "This submission is ready for a revised upload."
+            : "Resubmission is not currently available.";
+        }
+
+        async function loadSubmissionDetail(submissionId) {
+          const payload = await apiRequest(
+            "/submissions/" + encodeURIComponent(submissionId) + "/details"
+          );
+          state.submissionDetail = payload;
+          renderSubmissionDetail();
+        }
+
+        async function uploadFileToPresignedUrl(uploadInit, file) {
+          const uploadUrl = uploadInit.uploadUrl;
+          const submissionId = uploadInit.submissionId;
+          const versionNumber = uploadInit.versionNumber;
+          if (!uploadUrl || !submissionId || !versionNumber) {
+            throw new Error("Upload initialization response is incomplete.");
+          }
+          const putHeaders = {};
+          if (file.type) putHeaders["Content-Type"] = file.type;
+          const putResponse = await fetch(uploadUrl, {
+            method: "PUT",
+            body: file,
+            headers: putHeaders
+          });
+          if (!putResponse.ok) {
+            throw new Error("S3 upload failed with status " + putResponse.status + ".");
+          }
+          return {
+            submissionId: submissionId,
+            versionNumber: versionNumber
+          };
+        }
+
+        async function updateSubmissionStatus(status) {
+          const detail = state.submissionDetail;
+          if (!detail || !detail.submission) return;
+          const submissionId = detail.submission.submissionId;
+          await apiRequest(
+            "/submissions/" + encodeURIComponent(submissionId) + "/status",
+            {
+              method: "POST",
+              body: { status: status }
+            }
+          );
+          await loadSubmissionDetail(submissionId);
+          await render();
+        }
+
+        async function downloadSubmissionVersion(submissionId, versionNumber) {
+          const payload = await apiRequest(
+            "/downloads/" + encodeURIComponent(submissionId)
+            + "/" + encodeURIComponent(versionNumber)
+          );
+          if (payload.downloadUrl) {
+            window.open(payload.downloadUrl, "_blank", "noopener");
+          }
+        }
+
+        function getRoute() {
+          const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+          if (pathname === "/admin") {
+            return "admin";
+          }
+          const hash = window.location.hash || "#/dashboard";
+          const route = hash.replace(/^#\//, "");
+          return route || "dashboard";
+        }
+
+        function buildUrlForRoute(route) {
+          if (route === "admin") {
+            return window.location.origin + "/admin";
+          }
+          const callbackPath = new URL(state.config.callbackUrl).pathname || "/";
+          const normalizedPath = callbackPath || "/";
+          return window.location.origin + normalizedPath + "#/" + (route || "dashboard");
+        }
+
+        function setRoute(route, replace) {
+          const nextRoute = route || "dashboard";
+          const shouldUseHistory = nextRoute === "admin" || window.location.pathname === "/admin";
+          if (shouldUseHistory) {
+            const historyMethod = replace ? "replaceState" : "pushState";
+            window.history[historyMethod]({}, document.title, buildUrlForRoute(nextRoute));
+            render().catch(function (error) {
+              showToast(error.message || "Unable to render page.", "error");
+            });
+            return;
+          }
+          window.location.hash = "#/" + nextRoute;
+        }
+
+        function renderNav(route) {
+          const normalizedRoute = route.indexOf("submissions/") === 0 ? "dashboard" : route;
+          for (const btn of els.navButtons) {
+            const target = btn.getAttribute("data-route");
+            const shouldShow =
+              (target === "dashboard" && (isStudent() || isStaff()))
+              || (target === "admin" && isAdmin())
+              || (target === "upload" && isStudent())
+              || (target === "courses" && isStaff());
+            setHidden(btn, !shouldShow);
+            btn.classList.toggle("active", shouldShow && target === normalizedRoute);
+          }
+        }
+
+        function renderMainViews(route) {
+          const authenticated = Boolean(state.accessToken && state.idToken);
+          setHidden(els.landingView, authenticated);
+          setHidden(els.sideNav, !authenticated || !state.primaryGroup);
+          setHidden(els.ungroupedView, true);
+          setHidden(els.adminDeniedView, true);
+          setHidden(els.adminView, true);
+          setHidden(els.dashboardView, true);
+          setHidden(els.submissionDetailView, true);
+          setHidden(els.uploadView, true);
+          setHidden(els.coursesView, true);
+          setHidden(els.staffFilter, true);
+
+          if (!authenticated) {
+            return;
+          }
+
+          if (!state.primaryGroup) {
+            setHidden(els.sideNav, true);
+            setHidden(els.ungroupedView, false);
+            return;
+          }
+
+          if (route === "dashboard" && !isStudent() && !isStaff() && isAdmin()) {
+            setRoute("admin", true);
+            return;
+          }
+
+          if (!isStudent() && route === "upload") {
+            setRoute(isAdmin() ? "admin" : "dashboard", true);
+            return;
+          }
+          if (!isStaff() && route === "courses") {
+            setRoute(isAdmin() ? "admin" : "dashboard", true);
+            return;
+          }
+          if (route === "admin" && !isAdmin()) {
+            renderNav(route);
+            setHidden(els.adminDeniedView, false);
+            return;
+          }
+          if (route.indexOf("submissions/") === 0 && !isStudent() && !isStaff()) {
+            setRoute(isAdmin() ? "admin" : "dashboard", true);
+            return;
+          }
+
+          renderNav(route);
+
+          if (route === "admin") {
+            renderAdminUserCard();
+            setHidden(els.adminView, false);
+            return;
+          }
+
+          if (route.indexOf("submissions/") === 0) {
+            setHidden(els.submissionDetailView, false);
+            return;
+          }
+
+          if (route === "upload" && isStudent()) {
+            setHidden(els.uploadView, false);
+            return;
+          }
+
+          if (route === "courses" && isStaff()) {
+            setHidden(els.coursesView, false);
+            setHidden(els.createCoursePanel, false);
+            setHidden(els.assignStaffPanel, false);
+            return;
+          }
+
+          setHidden(els.dashboardView, false);
+          if (state.primaryGroup === "Students") {
+            els.dashboardSubtitle.textContent = "Your recent assignment submissions.";
+          } else {
+            els.dashboardSubtitle.textContent = "Course-level submissions for staff.";
+            setHidden(els.staffFilter, false);
+          }
+        }
+
+        async function refreshCurrentData(route) {
+          if (!state.primaryGroup) return;
+          const submissionId = getRouteSubmissionId(route);
+          if (route === "admin") {
+            return;
+          } else if (submissionId) {
+            await loadAvailableCourses(false);
+            await loadSubmissionDetail(submissionId);
+          } else if (state.primaryGroup === "Students" && route === "dashboard") {
+            await loadStudentSubmissions();
+          } else if (isStudent() && route === "upload") {
+            await loadAvailableCourses(false);
+          } else if (isStaff() && route === "dashboard") {
+            await loadAvailableCourses(false);
+            const savedCourse = sessionStorage.getItem(STORAGE.staffCourseId) || "";
+            if (!els.courseFilterSelect.value && savedCourse) {
+              els.courseFilterSelect.value = savedCourse;
+            }
+            await loadStaffSubmissions();
+          } else if (isStaff() && route === "courses") {
+            await loadAvailableCourses(false);
+          }
+        }
+
+        function renderAdminUserCard() {
+          const user = state.adminUser;
+          const hasUser = Boolean(user && user.email);
+          setHidden(els.adminUserCard, !hasUser);
+          setHidden(els.adminUserState, hasUser);
+
+          if (!hasUser) {
+            els.adminUserState.textContent = "Search for a user to view current groups.";
+            els.adminUserMetaList.innerHTML = "";
+            els.adminUserGroups.innerHTML = "";
+          } else {
+            els.adminUserMetaList.innerHTML = "";
+            [
+              { label: "Email", value: user.email || "-" },
+              { label: "User ID", value: user.sub || "-" },
+              { label: "Username", value: user.username || "-" }
+            ].forEach(function (item) {
+              const wrapper = document.createElement("div");
+              const label = document.createElement("span");
+              const value = document.createElement("span");
+              label.className = "muted";
+              label.textContent = item.label;
+              value.textContent = item.value;
+              wrapper.appendChild(label);
+              wrapper.appendChild(value);
+              els.adminUserMetaList.appendChild(wrapper);
+            });
+
+            els.adminUserGroups.innerHTML = "";
+            const groups = user.groups && user.groups.length ? user.groups : ["No groups"];
+            groups.forEach(function (groupName) {
+              const chip = document.createElement("span");
+              chip.className = "group-chip";
+              chip.textContent = groupName;
+              els.adminUserGroups.appendChild(chip);
+            });
+          }
+
+          const groups = new Set((user && user.groups) || []);
+          els.addStudentGroupBtn.disabled = !hasUser || groups.has("Students");
+          els.removeStudentGroupBtn.disabled = !hasUser || !groups.has("Students");
+          els.addStaffGroupBtn.disabled = !hasUser || groups.has("Staff");
+          els.removeStaffGroupBtn.disabled = !hasUser || !groups.has("Staff");
+        }
+
+        async function handleAdminLookup(event) {
+          event.preventDefault();
+          const email = (els.adminUserEmailInput.value || "").trim();
+          if (!email) {
+            showToast("User Email is required.", "error");
+            return;
+          }
+
+          els.adminLookupHint.textContent = "Loading user...";
+          try {
+            const payload = await apiRequest("/admin/users?email=" + encodeURIComponent(email));
+            state.adminUser = payload.user || null;
+            renderAdminUserCard();
+            els.adminLookupHint.textContent = "User loaded.";
+            els.adminGroupActionHint.textContent = "";
+            showToast("User loaded.", "success");
+          } catch (error) {
+            state.adminUser = null;
+            renderAdminUserCard();
+            els.adminLookupHint.textContent = "";
+            showToast(error.message || "Unable to load user.", "error");
+          }
+        }
+
+        async function handleAdminGroupAction(action, groupName) {
+          if (!state.adminUser || !state.adminUser.email) {
+            showToast("Search for a user first.", "error");
+            return;
+          }
+
+          els.adminGroupActionHint.textContent =
+            (action === "add" ? "Adding to " : "Removing from ") + groupName + "...";
+          try {
+            const payload = await apiRequest("/admin/groups/" + action, {
+              method: "POST",
+              body: {
+                email: state.adminUser.email,
+                groupName: groupName
+              }
+            });
+            state.adminUser = payload.user || state.adminUser;
+            renderAdminUserCard();
+            els.adminGroupActionHint.textContent =
+              "User " + (action === "add" ? "added to " : "removed from ") + groupName + ".";
+            showToast(
+              "User " + (action === "add" ? "added to " : "removed from ") + groupName + ".",
+              "success"
+            );
+          } catch (error) {
+            els.adminGroupActionHint.textContent = "";
+            showToast(error.message || "Unable to update group membership.", "error");
+          }
+        }
+
+        async function render() {
+          setAuthChrome();
+          const route = getRoute();
+          renderMainViews(route);
+          if (state.accessToken && state.idToken && state.primaryGroup) {
+            try {
+              await refreshCurrentData(route);
+            } catch (error) {
+              showToast(error.message || "Unable to load portal data.", "error");
+            }
+          }
+        }
+
+        async function handleUploadSubmit(event) {
+          event.preventDefault();
+          if (!isStudent()) return;
+
+          const selection = parseCourseSelection(els.courseSelect.value);
+          const assignmentId = (els.assignmentSelect.value || "").trim();
+          const title = (els.titleInput.value || "").trim();
+          const file = els.fileInput.files && els.fileInput.files[0];
+
+          if (!selection.courseId || !selection.termId || !assignmentId || !title || !file) {
+            showToast("Course, Assignment, Title, and file are required.", "error");
+            return;
+          }
+
+          els.uploadBtn.disabled = true;
+          els.uploadHint.textContent = "Creating submission and upload URL...";
+
+          try {
+            const uploadInit = await apiRequest("/uploads/request", {
+              method: "POST",
+              body: {
+                courseId: selection.courseId,
+                termId: selection.termId,
+                assignmentId: assignmentId,
+                title: title,
+                originalFilename: file.name,
+                fileSizeBytes: file.size
+              }
+            });
+
+            els.uploadHint.textContent = "Uploading file to S3...";
+            const uploaded = await uploadFileToPresignedUrl(uploadInit, file);
+
+            els.uploadHint.textContent = "Confirming upload...";
+            await apiRequest("/uploads/confirm", {
+              method: "POST",
+              body: {
+                submissionId: uploaded.submissionId,
+                versionNumber: uploaded.versionNumber
+              }
+            });
+
+            showToast("Upload completed successfully.", "success");
+            els.uploadHint.textContent = "Upload complete.";
+            els.uploadForm.reset();
+            state.assignments = [];
+            setAssignmentOptions([], "Select an assignment...");
+            setRoute("dashboard");
+            await render();
+          } catch (error) {
+            els.uploadHint.textContent = "";
+            showToast(error.message || "Upload failed.", "error");
+          } finally {
+            els.uploadBtn.disabled = false;
+          }
+        }
+
+        function buildLogoutUrl() {
+          const params = new URLSearchParams({
+            client_id: state.config.cognitoClientId,
+            logout_uri: state.config.callbackUrl
+          });
+          return state.config.cognitoAuthDomain + "/logout?" + params.toString();
+        }
+
+        async function handleCreateCourse(event) {
+          event.preventDefault();
+
+          if (!isStaff()) {
+            showToast("Only staff can create courses.", "error");
+            return;
+          }
+
+          const courseId = (els.newCourseIdInput.value || "").trim();
+          const termId = (els.newTermSelect.value || "").trim();
+          const name = (els.newCourseNameInput.value || "").trim();
+          const description = (els.newCourseDescInput.value || "").trim();
+          if (!courseId || !termId || !name) {
+            showToast("Course ID, Term, and Course Name are required.", "error");
+            return;
+          }
+
+          els.createCourseHint.textContent = "Creating course...";
+          try {
+            await apiRequest("/courses", {
+              method: "POST",
+              body: {
+                courseId: courseId,
+                termId: termId,
+                name: name,
+                description: description
+              }
+            });
+            els.createCourseForm.reset();
+            els.createCourseHint.textContent = "Course created.";
+            state.coursesLoaded = false;
+            await loadAvailableCourses(true);
+            showToast("Course created successfully.", "success");
+          } catch (error) {
+            els.createCourseHint.textContent = "";
+            showToast(error.message || "Unable to create course.", "error");
+          }
+        }
+
+        async function handleCreateAssignment(event) {
+          event.preventDefault();
+
+          const selection = parseCourseSelection(els.assignCourseSelect.value);
+          const assignmentId = (els.newAssignmentIdInput.value || "").trim();
+          const title = (els.newAssignmentTitleInput.value || "").trim();
+          const dueDateLocal = (els.newAssignmentDueInput.value || "").trim();
+          if (!selection.courseId || !selection.termId || !assignmentId || !title) {
+            showToast("Course, Assignment ID, and Title are required.", "error");
+            return;
+          }
+
+          els.createAssignmentHint.textContent = "Adding assignment...";
+          try {
+            await apiRequest(
+              "/courses/" + encodeURIComponent(selection.courseId)
+              + "/terms/" + encodeURIComponent(selection.termId)
+              + "/assignments",
+              {
+                method: "POST",
+                body: {
+                  assignmentId: assignmentId,
+                  title: title,
+                  dueDate: dueDateLocal ? new Date(dueDateLocal).toISOString() : "",
+                  description: ""
+                }
+              }
+            );
+            els.createAssignmentForm.reset();
+            els.createAssignmentHint.textContent = "Assignment added.";
+            showToast("Assignment created successfully.", "success");
+          } catch (error) {
+            els.createAssignmentHint.textContent = "";
+            showToast(error.message || "Unable to create assignment.", "error");
+          }
+        }
+
+        async function handleEnrollStudent(event) {
+          event.preventDefault();
+
+          const selection = parseCourseSelection(els.enrollCourseSelect.value);
+          const studentEmail = (els.enrollStudentEmailInput.value || "").trim();
+          if (!selection.courseId || !selection.termId || !studentEmail) {
+            showToast("Course and Student Email are required.", "error");
+            return;
+          }
+
+          els.enrollStudentHint.textContent = "Enrolling student...";
+          try {
+            await apiRequest(
+              "/courses/" + encodeURIComponent(selection.courseId)
+              + "/terms/" + encodeURIComponent(selection.termId)
+              + "/enrollments",
+              {
+                method: "POST",
+                body: { studentEmail: studentEmail }
+              }
+            );
+            els.enrollStudentForm.reset();
+            els.enrollStudentHint.textContent = "Student enrolled.";
+            showToast("Student enrolled successfully.", "success");
+          } catch (error) {
+            els.enrollStudentHint.textContent = "";
+            showToast(error.message || "Unable to enroll student.", "error");
+          }
+        }
+
+        async function handleAssignStaff(event) {
+          event.preventDefault();
+
+          const selection = parseCourseSelection(els.staffCourseSelect.value);
+          const staffEmail = (els.staffMemberEmailInput.value || "").trim();
+          const staffRole = (els.staffRoleSelect.value || "").trim();
+          if (!selection.courseId || !selection.termId || !staffEmail || !staffRole) {
+            showToast("Course, Staff Email, and Staff Role are required.", "error");
+            return;
+          }
+
+          els.assignStaffHint.textContent = "Assigning staff...";
+          try {
+            await apiRequest(
+              "/courses/" + encodeURIComponent(selection.courseId)
+              + "/terms/" + encodeURIComponent(selection.termId)
+              + "/staff",
+              {
+                method: "POST",
+                body: {
+                  staffEmail: staffEmail,
+                  staffRole: staffRole
+                }
+              }
+            );
+            els.assignStaffForm.reset();
+            els.assignStaffHint.textContent = "Staff assigned.";
+            state.coursesLoaded = false;
+            await loadAvailableCourses(true);
+            showToast("Staff assigned successfully.", "success");
+          } catch (error) {
+            els.assignStaffHint.textContent = "";
+            showToast(getFriendlyStaffAssignError(error), "error");
+          }
+        }
+
+        async function handleUnenrollStudent(event) {
+          event.preventDefault();
+
+          const selection = parseCourseSelection(els.unenrollCourseSelect.value);
+          const studentEmail = (els.unenrollStudentEmailInput.value || "").trim();
+          if (!selection.courseId || !selection.termId || !studentEmail) {
+            showToast("Course and Student Email are required.", "error");
+            return;
+          }
+
+          els.unenrollStudentHint.textContent = "Removing student enrollment...";
+          try {
+            await apiRequest(
+              "/courses/" + encodeURIComponent(selection.courseId)
+              + "/terms/" + encodeURIComponent(selection.termId)
+              + "/enrollments",
+              {
+                method: "DELETE",
+                body: { studentEmail: studentEmail }
+              }
+            );
+            els.unenrollStudentForm.reset();
+            els.unenrollStudentHint.textContent = "Student unenrolled.";
+            state.coursesLoaded = false;
+            await loadAvailableCourses(true);
+            showToast("Student unenrolled successfully.", "success");
+          } catch (error) {
+            els.unenrollStudentHint.textContent = "";
+            showToast(error.message || "Unable to unenroll student.", "error");
+          }
+        }
+
+        async function handleUnassignStaff(event) {
+          event.preventDefault();
+
+          const selection = parseCourseSelection(els.unassignStaffCourseSelect.value);
+          const staffEmail = (els.unassignStaffEmailInput.value || "").trim();
+          if (!selection.courseId || !selection.termId || !staffEmail) {
+            showToast("Course and Staff Email are required.", "error");
+            return;
+          }
+
+          els.unassignStaffHint.textContent = "Removing staff assignment...";
+          try {
+            await apiRequest(
+              "/courses/" + encodeURIComponent(selection.courseId)
+              + "/terms/" + encodeURIComponent(selection.termId)
+              + "/staff",
+              {
+                method: "DELETE",
+                body: { staffEmail: staffEmail }
+              }
+            );
+            els.unassignStaffForm.reset();
+            els.unassignStaffHint.textContent = "Staff unassigned.";
+            state.coursesLoaded = false;
+            await loadAvailableCourses(true);
+            showToast("Staff unassigned successfully.", "success");
+          } catch (error) {
+            els.unassignStaffHint.textContent = "";
+            showToast(getFriendlyStaffUnassignError(error), "error");
+          }
+        }
+
+        async function handleCommentSubmit(event) {
+          event.preventDefault();
+          const detail = state.submissionDetail;
+          if (!detail || !detail.submission) return;
+
+          const body = (els.commentBodyInput.value || "").trim();
+          const versionRef = (els.commentVersionSelect.value || "").trim();
+          if (!body) {
+            showToast("Comment text is required.", "error");
+            return;
+          }
+
+          els.commentHint.textContent = "Saving comment...";
+          try {
+            await apiRequest("/comments", {
+              method: "POST",
+              body: {
+                submissionId: detail.submission.submissionId,
+                body: body,
+                versionRef: versionRef ? Number(versionRef) : null
+              }
+            });
+            els.commentHint.textContent = "Comment saved.";
+            await loadSubmissionDetail(detail.submission.submissionId);
+            showToast("Comment added successfully.", "success");
+          } catch (error) {
+            els.commentHint.textContent = "";
+            showToast(error.message || "Unable to save comment.", "error");
+          }
+        }
+
+        async function handleGradeSubmit(event) {
+          event.preventDefault();
+          const detail = state.submissionDetail;
+          if (!detail || !detail.submission) return;
+
+          const score = (els.gradeScoreInput.value || "").trim();
+          const maxScore = (els.gradeMaxScoreInput.value || "").trim();
+          if (!score || !maxScore) {
+            showToast("Score and max score are required.", "error");
+            return;
+          }
+
+          els.gradeHint.textContent = "Saving grade...";
+          try {
+            await apiRequest("/grades", {
+              method: "POST",
+              body: {
+                submissionId: detail.submission.submissionId,
+                score: Number(score),
+                maxScore: Number(maxScore),
+                feedback: (els.gradeFeedbackInput.value || "").trim(),
+                status: els.gradeStatusSelect.value || "DRAFT"
+              }
+            });
+            els.gradeHint.textContent = "Grade saved.";
+            await loadSubmissionDetail(detail.submission.submissionId);
+            await render();
+            showToast("Grade saved successfully.", "success");
+          } catch (error) {
+            els.gradeHint.textContent = "";
+            showToast(error.message || "Unable to save grade.", "error");
+          }
+        }
+
+        async function handleRevisionRequest() {
+          const detail = state.submissionDetail;
+          if (!detail || !detail.submission) return;
+
+          els.gradeHint.textContent = "Updating submission status...";
+          try {
+            await updateSubmissionStatus("NEEDS_REVISION");
+            els.gradeHint.textContent = "Submission marked for revision.";
+            showToast("Submission marked as needing revision.", "success");
+          } catch (error) {
+            els.gradeHint.textContent = "";
+            showToast(error.message || "Unable to update submission status.", "error");
+          }
+        }
+
+        async function handleMarkSubmitted() {
+          const detail = state.submissionDetail;
+          if (!detail || !detail.submission) return;
+
+          els.gradeHint.textContent = "Updating submission status...";
+          try {
+            await updateSubmissionStatus("SUBMITTED");
+            els.gradeHint.textContent = "Submission moved back to submitted.";
+            showToast("Submission moved back to submitted.", "success");
+          } catch (error) {
+            els.gradeHint.textContent = "";
+            showToast(error.message || "Unable to update submission status.", "error");
+          }
+        }
+
+        async function handleResubmit(event) {
+          event.preventDefault();
+          const detail = state.submissionDetail;
+          if (!detail || !detail.submission) return;
+
+          const file = els.resubmitFileInput.files && els.resubmitFileInput.files[0];
+          if (!file) {
+            showToast("Choose a revised file to upload.", "error");
+            return;
+          }
+
+          els.resubmitHint.textContent = "Creating revised upload URL...";
+          try {
+            const uploadInit = await apiRequest(
+              "/submissions/" + encodeURIComponent(detail.submission.submissionId) + "/versions/request",
+              {
+                method: "POST",
+                body: {
+                  originalFilename: file.name,
+                  fileSizeBytes: file.size
+                }
+              }
+            );
+
+            els.resubmitHint.textContent = "Uploading revised file...";
+            const uploaded = await uploadFileToPresignedUrl(uploadInit, file);
+
+            els.resubmitHint.textContent = "Confirming revised upload...";
+            await apiRequest(
+              "/submissions/" + encodeURIComponent(detail.submission.submissionId) + "/versions/confirm",
+              {
+                method: "POST",
+                body: {
+                  versionNumber: uploaded.versionNumber
+                }
+              }
+            );
+
+            els.resubmitHint.textContent = "Revised upload complete.";
+            await loadSubmissionDetail(detail.submission.submissionId);
+            await render();
+            showToast("Revised version uploaded successfully.", "success");
+          } catch (error) {
+            els.resubmitHint.textContent = "";
+            showToast(error.message || "Unable to upload revised version.", "error");
+          }
+        }
+
+        function attachEvents() {
+          els.signInBtn.addEventListener("click", startSignIn);
+          els.signOutBtn.addEventListener("click", function () {
+            clearSession();
+            window.location.assign(buildLogoutUrl());
+          });
+
+          els.navButtons.forEach(function (btn) {
+            btn.addEventListener("click", function () {
+              const route = btn.getAttribute("data-route");
+              setRoute(route);
+            });
+          });
+
+          window.addEventListener("hashchange", function () {
+            render().catch(function (error) {
+              showToast(error.message || "Unable to render page.", "error");
+            });
+          });
+
+          window.addEventListener("popstate", function () {
+            render().catch(function (error) {
+              showToast(error.message || "Unable to render page.", "error");
+            });
+          });
+
+          els.courseFilterSelect.addEventListener("change", function () {
+            loadStaffSubmissions().catch(function (error) {
+              showToast(error.message || "Unable to load course submissions.", "error");
+            });
+          });
+
+          els.assignmentFilterSelect.addEventListener("change", function () {
+            applyStaffSubmissionFilters();
+          });
+
+          els.statusFilterSelect.addEventListener("change", function () {
+            applyStaffSubmissionFilters();
+          });
+
+          els.courseSelect.addEventListener("change", function () {
+            const selection = parseCourseSelection(els.courseSelect.value);
+            state.assignments = [];
+            if (!selection.courseId || !selection.termId) {
+              setAssignmentOptions([], "Select an assignment...");
+              els.uploadHint.textContent = "";
+              return;
+            }
+            loadAssignmentsForCourse(selection.courseId, selection.termId).catch(function (error) {
+              showToast(error.message || "Unable to load assignments.", "error");
+            });
+          });
+
+          els.uploadForm.addEventListener("submit", handleUploadSubmit);
+          els.createCourseForm.addEventListener("submit", handleCreateCourse);
+          els.createAssignmentForm.addEventListener("submit", handleCreateAssignment);
+          els.enrollStudentForm.addEventListener("submit", handleEnrollStudent);
+          els.unenrollStudentForm.addEventListener("submit", handleUnenrollStudent);
+          els.assignStaffForm.addEventListener("submit", handleAssignStaff);
+          els.unassignStaffForm.addEventListener("submit", handleUnassignStaff);
+          els.adminLookupForm.addEventListener("submit", handleAdminLookup);
+          els.addStudentGroupBtn.addEventListener("click", function () {
+            handleAdminGroupAction("add", "Students").catch(function (error) {
+              showToast(error.message || "Unable to update group membership.", "error");
+            });
+          });
+          els.removeStudentGroupBtn.addEventListener("click", function () {
+            handleAdminGroupAction("remove", "Students").catch(function (error) {
+              showToast(error.message || "Unable to update group membership.", "error");
+            });
+          });
+          els.addStaffGroupBtn.addEventListener("click", function () {
+            handleAdminGroupAction("add", "Staff").catch(function (error) {
+              showToast(error.message || "Unable to update group membership.", "error");
+            });
+          });
+          els.removeStaffGroupBtn.addEventListener("click", function () {
+            handleAdminGroupAction("remove", "Staff").catch(function (error) {
+              showToast(error.message || "Unable to update group membership.", "error");
+            });
+          });
+          els.commentForm.addEventListener("submit", handleCommentSubmit);
+          els.gradeForm.addEventListener("submit", handleGradeSubmit);
+          els.requestRevisionBtn.addEventListener("click", function () {
+            handleRevisionRequest().catch(function (error) {
+              showToast(error.message || "Unable to request revision.", "error");
+            });
+          });
+          els.markSubmittedBtn.addEventListener("click", function () {
+            handleMarkSubmitted().catch(function (error) {
+              showToast(error.message || "Unable to move submission.", "error");
+            });
+          });
+          els.resubmitForm.addEventListener("submit", handleResubmit);
+          els.backToDashboardBtn.addEventListener("click", function () {
+            setRoute("dashboard");
+          });
+          els.submissionsTableBody.addEventListener("click", function (event) {
+            const target = event.target.closest("[data-open-submission]");
+            if (!target) return;
+            const submissionId = target.getAttribute("data-open-submission");
+            if (submissionId) {
+              setRoute("submissions/" + encodeURIComponent(submissionId));
+            }
+          });
+          els.versionList.addEventListener("click", function (event) {
+            const target = event.target.closest("[data-download-version]");
+            if (!target) return;
+            const submissionId = target.getAttribute("data-download-submission");
+            const versionNumber = target.getAttribute("data-download-version");
+            downloadSubmissionVersion(submissionId, versionNumber).catch(function (error) {
+              showToast(error.message || "Unable to generate download link.", "error");
+            });
+          });
+        }
+
+        async function bootstrap() {
+          try {
+            state.config = readConfig();
+            state.standardTerms = getStandardTerms();
+            populateStandardTermSelect();
+            attachEvents();
+
+            await handleAuthCallbackIfPresent();
+            applySessionFromStorage();
+            await render();
+          } catch (error) {
+            clearSession();
+            setAuthChrome();
+            renderMainViews("dashboard");
+            showToast(error.message || "Failed to initialize portal.", "error");
+          }
+        }
+
+        bootstrap();
+      })();
+    </script>
+  </body>
+</html>

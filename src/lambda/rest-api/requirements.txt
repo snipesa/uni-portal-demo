@@ -1,0 +1,8 @@
+# Runtime dependencies for the REST API Lambda (Python 3.12).
+#
+# boto3 and botocore are provided by the Lambda runtime — do NOT include them
+# here to keep the deployment package small and avoid version drift.
+#
+# Add third-party packages below only if they are genuinely required.
+# Example:
+#   aws-lambda-powertools==2.x.x   # structured logging / tracing helper
