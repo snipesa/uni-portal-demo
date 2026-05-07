@@ -33,6 +33,11 @@ output "frontend_artifact_prefix" {
   value       = var.frontend_artifact_prefix
 }
 
+output "frontend_callback_url" {
+  description = "Frontend callback URL registered with Cognito and used by runtime config."
+  value       = var.frontend_callback_url
+}
+
 output "upload_bucket_name" {
   description = "Application upload bucket name."
   value       = module.upload_bucket.bucket_name
@@ -101,6 +106,11 @@ output "http_api_url" {
 output "amplify_app_id" {
   description = "Amplify application ID used by frontend deploy scripts."
   value       = module.amplify.app_id
+}
+
+output "amplify_branch_name" {
+  description = "Amplify branch name used by frontend deploy scripts."
+  value       = var.environment
 }
 
 output "amplify_default_domain" {

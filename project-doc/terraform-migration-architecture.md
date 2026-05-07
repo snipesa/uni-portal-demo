@@ -12,35 +12,36 @@ application uploads with infrastructure state and build artifacts.
 ## Target Repository Shape
 
 ```text
-uni-portal-terraform/
-├── infrastructure/
-│   ├── terraform/
-│   │   ├── modules/
-│   │   │   ├── amplify/
-│   │   │   ├── cognito/
-│   │   │   ├── dynamodb/
-│   │   │   ├── http-api/
-│   │   │   ├── rest-api-lambda/
-│   │   │   └── upload-bucket/
-│   │   └── root/
-│   │       ├── backend.tf
-│   │       ├── backend.hcl.example
-│   │       ├── main.tf
-│   │       ├── providers.tf
-│   │       ├── variables.tf
-│   │       ├── outputs.tf
-│   │       └── terraform.tfvars.example
-│   └── scripts/
-│       ├── package-lambda.sh
-│       ├── deploy-infra.sh
-│       └── deploy-frontend.sh
-├── frontend-website/
-├── src/
-├── project-doc/
-├── reference-materials/
+uni-portal-terraform-workspace/
+├── AGENTS.md
 ├── Development.md
-├── README.md
-└── AGENTS.md
+├── reference-materials/
+└── uni-portal-terraform/
+    ├── README.md
+    ├── frontend-website/
+    ├── project-doc/
+    ├── src/
+    └── infrastructure/
+        ├── terraform/
+        │   ├── modules/
+        │   │   ├── amplify/
+        │   │   ├── cognito/
+        │   │   ├── dynamodb/
+        │   │   ├── http-api/
+        │   │   ├── rest-api-lambda/
+        │   │   └── upload-bucket/
+        │   └── root/
+        │       ├── backend.tf
+        │       ├── backend.hcl.example
+        │       ├── main.tf
+        │       ├── providers.tf
+        │       ├── variables.tf
+        │       ├── outputs.tf
+        │       └── terraform.tfvars.example
+        └── scripts/
+            ├── package-lambda.sh
+            ├── deploy-infra.sh
+            └── deploy-frontend.sh
 ```
 
 ## Terraform Design

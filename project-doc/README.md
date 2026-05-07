@@ -7,4 +7,4 @@ This folder contains project-level documentation for the Terraform migration.
 - [Platform Usage Guide](platform-usage-guide.md)
 - [Source Application Technical Baseline](project-technical-architecture.md)
 
-Implementation stories live in [../reference-materials](../reference-materials).
+Implementation stories live in [../../reference-materials](../../reference-materials).

@@ -1,7 +1,7 @@
 # University Assignment Portal - Terraform Migration
 
-This repository is the Terraform migration workspace for the existing
-University Assignment Portal in `../uni-portal`.
+This repository is the Terraform application workspace for the existing
+University Assignment Portal in `../../uni-portal`.
 
 The current project remains CloudFormation-based. This workspace is intended to
 plan and implement the migration in phases without disturbing the working
@@ -22,9 +22,9 @@ application behavior:
 
 ## Story Index
 
-Use [Development.md](Development.md) as the migration story plan.
+Use [../Development.md](../Development.md) as the migration story plan.
 
-Detailed story files live in [reference-materials](reference-materials).
+Detailed story files live in [../reference-materials](../reference-materials).
 
 ## Bootstrap Contents
 
@@ -38,7 +38,7 @@ Terraform migration:
 - `project-doc/` - product and platform behavior documentation plus the
   Terraform migration architecture.
 
-CloudFormation templates and deployment scripts remain only in `../uni-portal`
+CloudFormation templates and deployment scripts remain only in `../../uni-portal`
 and will be translated into Terraform through the migration stories.
 
 ## Terraform Root
