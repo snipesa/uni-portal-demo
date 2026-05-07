@@ -8,21 +8,6 @@ variable "environment" {
   type        = string
 }
 
-variable "name_prefix" {
-  description = "Shared resource name prefix."
-  type        = string
-}
-
-variable "api_name" {
-  description = "API Gateway HTTP API name."
-  type        = string
-}
-
-variable "lambda_name" {
-  description = "REST API Lambda function name for invoke permission."
-  type        = string
-}
-
 variable "lambda_arn" {
   description = "REST API Lambda function ARN for API integration."
   type        = string

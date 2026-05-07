@@ -8,23 +8,8 @@ variable "environment" {
   type        = string
 }
 
-variable "name_prefix" {
-  description = "Shared resource name prefix."
-  type        = string
-}
-
-variable "function_name" {
-  description = "REST API Lambda function name."
-  type        = string
-}
-
-variable "operations_bucket_name" {
-  description = "Manual operations bucket containing Lambda artifacts."
-  type        = string
-}
-
-variable "lambda_artifact_prefix" {
-  description = "Operations bucket prefix for Lambda artifacts."
+variable "lambda_code_bucket_name" {
+  description = "S3 bucket that holds the Lambda deployment zip."
   type        = string
 }
 
@@ -33,12 +18,27 @@ variable "upload_bucket_name" {
   type        = string
 }
 
+variable "upload_bucket_arn" {
+  description = "Application upload bucket ARN used by the Lambda IAM policy."
+  type        = string
+}
+
 variable "main_table_name" {
   description = "DynamoDB main table name passed to Lambda."
   type        = string
 }
 
+variable "main_table_arn" {
+  description = "DynamoDB main table ARN used by the Lambda IAM policy."
+  type        = string
+}
+
 variable "user_pool_id" {
   description = "Cognito user pool ID passed to Lambda."
+  type        = string
+}
+
+variable "user_pool_arn" {
+  description = "Cognito user pool ARN used by the Lambda IAM policy."
   type        = string
 }

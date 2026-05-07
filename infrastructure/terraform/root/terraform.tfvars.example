@@ -1,4 +1,4 @@
-project_name = "uni-portal"
+project_name = "cytora-uni-portal"
 environment  = "prod"
 aws_region   = "us-east-1"
 
