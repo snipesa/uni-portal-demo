@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Epic | Storage |
-| Status | Not Started |
+| Status | Completed |
 | Target Module | `modules/upload-bucket` |
 | Dependencies | Story 2 |
 

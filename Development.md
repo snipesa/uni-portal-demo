@@ -119,7 +119,7 @@ Manually provided infrastructure should include:
 - Manually create or identify the Terraform lock DynamoDB table
 - Create local `backend.hcl` from `backend.hcl.example`
 - Create local `terraform.tfvars` from `terraform.tfvars.example`
-- Provide values for artifact prefixes, callback URL, and Cognito domain suffix
+- Provide values for artifact prefixes and callback URL
 
 ### Milestone 1 - Migration Workspace Bootstrap
 - Copy unchanged source application files from `../uni-portal`

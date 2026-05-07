@@ -85,7 +85,6 @@ Values to provide:
 - `lambda_artifact_prefix`
 - `frontend_artifact_prefix`
 - `frontend_callback_url`
-- `cognito_domain_suffix`
 - optional `amplify_web_acl_arn`
 
 ## Acceptance Criteria

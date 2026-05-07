@@ -1,0 +1,9 @@
+project_name = "uni-portal"
+environment  = "prod"
+aws_region   = "us-east-1"
+
+operations_bucket_name   = "replace-with-manual-operations-bucket-name"
+lambda_artifact_prefix   = "lambda-artifacts"
+frontend_artifact_prefix = "frontend-builds"
+
+frontend_callback_url = "http://localhost:3000"

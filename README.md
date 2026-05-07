@@ -40,3 +40,28 @@ Terraform migration:
 
 CloudFormation templates and deployment scripts remain only in `../uni-portal`
 and will be translated into Terraform through the migration stories.
+
+## Terraform Root
+
+The single Terraform root lives in `infrastructure/terraform/root`.
+
+Before deploying, copy the visible examples to local-only files and fill in the
+manually created operations resources:
+
+```bash
+cd infrastructure/terraform/root
+cp backend.hcl.example backend.hcl
+cp terraform.tfvars.example terraform.tfvars
+terraform init -backend-config=backend.hcl
+```
+
+If the root was previously initialized with `-backend=false`, rerun that init
+command with `-reconfigure`.
+
+For local syntax checks before backend values exist, initialize without the
+remote backend:
+
+```bash
+terraform init -backend=false
+terraform validate
+```

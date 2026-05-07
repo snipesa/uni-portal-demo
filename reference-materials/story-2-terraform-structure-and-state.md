@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Epic | Terraform Foundation |
-| Status | Not Started |
+| Status | Completed |
 | Target Folders | `infrastructure/terraform/` |
 | Dependencies | Story 1 |
 
@@ -46,7 +46,6 @@ infrastructure/terraform/
   - `operations_bucket_name`
   - `lambda_artifact_prefix`
   - `frontend_artifact_prefix`
-  - `tags`
 - Create module skeletons with `main.tf`, `variables.tf`, and `outputs.tf`.
 - Create one Terraform root at `infrastructure/terraform/root`.
 - Define naming convention: `${project_name}-${environment}-<resource-purpose>`.

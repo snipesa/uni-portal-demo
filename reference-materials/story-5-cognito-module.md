@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Epic | Identity and Access |
-| Status | Not Started |
+| Status | Completed |
 | Target Module | `modules/cognito` |
 | Dependencies | Story 2 |
 
@@ -28,7 +28,7 @@ Terraform.
 - Preserve app client code flow for the SPA.
 - Parameterize callback and logout URLs.
 - Preserve group precedence.
-- Preserve the current MFA and self-registration behavior unless explicitly changed later.
+- Preserve the current MFA(disabled for now) and self-registration behavior unless explicitly changed later.
 - Output:
   - user pool ID
   - user pool ARN

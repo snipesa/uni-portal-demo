@@ -1,0 +1,8 @@
+# Copy this file to backend.hcl and fill in the manually created operations
+# resources before running terraform init -backend-config=backend.hcl.
+
+bucket         = "replace-with-operations-bucket-name"
+key            = "terraform-state/uni-portal/prod.tfstate"
+region         = "us-east-1"
+dynamodb_table = "replace-with-terraform-lock-table-name"
+encrypt        = true

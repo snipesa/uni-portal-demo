@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Epic | Terraform Foundation |
-| Status | Not Started |
+| Status | Completed |
 | Target Folder | `infrastructure/terraform/root/` |
 | Dependencies | Story 2 |
 

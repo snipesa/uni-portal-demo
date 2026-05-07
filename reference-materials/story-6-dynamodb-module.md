@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Epic | Database |
-| Status | Not Started |
+| Status | Completed |
 | Target Module | `modules/dynamodb` |
 | Dependencies | Story 2 |
 
