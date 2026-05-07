@@ -13,14 +13,48 @@ This repository contains a self-implemented University Assignment Portal built w
 
 ## Deployment Steps
 
+1. Go to the Terraform root and create local config files:
+
 ```bash
 cd infrastructure/terraform/root
 cp backend.hcl.example backend.hcl
 cp terraform.tfvars.example terraform.tfvars
-terraform init -backend-config=backend.hcl
-terraform validate
-terraform plan
-terraform apply
+```
+
+2. Update the necessary manual values in `backend.hcl` and `terraform.tfvars` (for example `operations_bucket_name` and environment-specific settings).
+
+3. Package and publish the Lambda artifact:
+
+```bash
+cd ../../scripts
+./package-lambda.sh -e <environment>
+```
+
+4. Deploy infrastructure (first pass):
+
+```bash
+./deploy-infra.sh -e <environment> --deploy
+```
+
+5. Deploy frontend website:
+
+```bash
+./deploy-frontend.sh -e <environment>
+```
+
+6. Copy the website output value from the frontend deployment result, then update `infrastructure/terraform/root/terraform.tfvars` with that website value.
+
+7. Redeploy infrastructure after the tfvars update:
+
+```bash
+./deploy-infra.sh -e <environment> --deploy
+```
+
+8. Verify deployment:
+
+```bash
+cd ../terraform/root
+terraform output
 ```
 
 ## Documentation
