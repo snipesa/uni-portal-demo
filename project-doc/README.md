@@ -1,10 +1,10 @@
-# Terraform Migration Project Docs
+# Project Documentation
 
-This folder contains project-level documentation for the Terraform migration.
+This folder keeps the project documentation at a high level.
 
-- [Terraform Migration Architecture](terraform-migration-architecture.md)
-- [Product Scope](product-scope.md)
-- [Platform Usage Guide](platform-usage-guide.md)
-- [Source Application Technical Baseline](project-technical-architecture.md)
+- [Platform Usage Guide](./platform-usage-guide.md)
+- [Technical Architecture](./project-technical-architecture.md)
 
-Implementation stories live in [../../reference-materials](../../reference-materials).
+Architecture diagram:
+
+- [Architecture Diagram](./arch-diagramv3.png)
