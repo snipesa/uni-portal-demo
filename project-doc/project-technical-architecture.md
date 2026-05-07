@@ -14,6 +14,11 @@ Submission and Grading Portal.
 6. Metadata and grading records are stored in DynamoDB (single-table design).
 7. Observability and security controls are enabled across services.
 
+## Architecture Diagram
+
+![University Assignment Portal Architecture](./arch-diagramv3.png)
+
+
 ## Tooling and Services
 ### Frontend and Delivery
 - AWS Amplify Hosting: Managed HTTPS/CDN hosting for the current static portal page and future SPA builds.
