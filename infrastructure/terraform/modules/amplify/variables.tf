@@ -8,16 +8,6 @@ variable "environment" {
   type        = string
 }
 
-variable "name_prefix" {
-  description = "Shared resource name prefix."
-  type        = string
-}
-
-variable "app_name" {
-  description = "Amplify app name."
-  type        = string
-}
-
 variable "operations_bucket_name" {
   description = "Manual operations bucket containing frontend artifacts."
   type        = string

@@ -64,10 +64,8 @@ module "http_api" {
 module "amplify" {
   source = "../modules/amplify"
 
-  app_name                 = "${local.name_prefix}-amplify-app"
   environment              = var.environment
   frontend_artifact_prefix = var.frontend_artifact_prefix
-  name_prefix              = local.name_prefix
   operations_bucket_name   = var.operations_bucket_name
   project_name             = var.project_name
 }
