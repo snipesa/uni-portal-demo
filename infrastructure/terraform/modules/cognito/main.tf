@@ -30,7 +30,7 @@ resource "aws_cognito_user_pool" "this" {
 }
 
 resource "aws_cognito_user_pool_domain" "hosted_ui" {
-  domain       = "${var.name_prefix}-cognito"
+  domain       = "${var.name_prefix}-auth"
   user_pool_id = aws_cognito_user_pool.this.id
 }
 

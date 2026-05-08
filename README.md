@@ -50,12 +50,25 @@ cd ../../scripts
 ./deploy-infra.sh -e <environment> --deploy
 ```
 
-8. Verify deployment:
+8. Redeploy frontend website so runtime config is regenerated from current Terraform outputs:
+
+```bash
+./deploy-frontend.sh -e <environment>
+```
+
+9. Verify deployment:
 
 ```bash
 cd ../terraform/root
 terraform output
 ```
+
+10. Verify login flow in browser (hard refresh with `Cmd+Shift+R` / `Ctrl+Shift+R`) to ensure the latest `config.js` values are used.
+
+## Post-Deployment Access
+
+- Use the deployed site URL for the main portal, and use `<deployed-url>/admin` for the admin section.
+- In AWS Cognito, create users as needed and add admin users to the `Admin` group so they can access admin features.
 
 ## Documentation
 

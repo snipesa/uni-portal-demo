@@ -41,6 +41,12 @@ if [ -z "$ENVIRONMENT" ]; then
   exit 1
 fi
 
+if [ "$ENVIRONMENT" != "dev" ] && [ "$ENVIRONMENT" != "prod" ]; then
+  echo "Error: -e <environment> must be one of: dev, prod." >&2
+  usage
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 TERRAFORM_TFVARS="${REPO_ROOT}/infrastructure/terraform/root/terraform.tfvars"

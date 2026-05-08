@@ -47,6 +47,12 @@ if [ -z "$ENVIRONMENT" ]; then
   exit 1
 fi
 
+if [ "$ENVIRONMENT" != "dev" ] && [ "$ENVIRONMENT" != "prod" ]; then
+  echo "Error: -e <environment> must be one of: dev, prod." >&2
+  usage
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 TERRAFORM_ROOT="${REPO_ROOT}/infrastructure/terraform/root"
@@ -59,12 +65,48 @@ if [ ! -f "$BACKEND_CONFIG" ]; then
   exit 1
 fi
 
+BACKEND_REGION="$(sed -nE 's/^[[:space:]]*region[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' "$BACKEND_CONFIG" | tail -n 1)"
+if [ -z "$BACKEND_REGION" ]; then
+  echo "Error: region not found in backend config: ${BACKEND_CONFIG}" >&2
+  exit 1
+fi
+
+export AWS_REGION="$BACKEND_REGION"
+export AWS_DEFAULT_REGION="$BACKEND_REGION"
+# Ensure SDKs (including Terraform AWS backend/provider chain) load ~/.aws/config
+# so SSO profiles using sso_session are resolved correctly when AWS_PROFILE is set.
+export AWS_SDK_LOAD_CONFIG=1
+
+# If a profile is set (common with SSO), materialize session credentials into
+# env vars so Terraform backend/provider can authenticate consistently.
+if [ -n "${AWS_PROFILE:-}" ] && command -v aws >/dev/null 2>&1; then
+  if PROFILE_CREDS="$(aws configure export-credentials --profile "${AWS_PROFILE}" --format env 2>/dev/null)"; then
+    # shellcheck disable=SC1090
+    eval "$PROFILE_CREDS"
+    unset AWS_PROFILE
+  fi
+fi
+
 echo "=========================================="
 echo " Terraform Infrastructure"
 echo "=========================================="
+
+if command -v aws >/dev/null 2>&1; then
+  echo ""
+  echo "==> Verifying AWS caller identity..."
+  if ! aws sts get-caller-identity --output text >/dev/null 2>&1; then
+    echo "Error: unable to resolve AWS credentials for Terraform." >&2
+    echo "Use one of: active SSO session, access keys env vars, or CI role credentials." >&2
+    if [ -n "${AWS_PROFILE:-}" ]; then
+      echo "Current AWS_PROFILE='${AWS_PROFILE}' failed. If using SSO, run: aws sso login --profile ${AWS_PROFILE}" >&2
+    fi
+    exit 1
+  fi
+fi
 echo "  Environment : ${ENVIRONMENT}"
 echo "  Root        : ${TERRAFORM_ROOT}"
 echo "  Backend     : ${BACKEND_CONFIG}"
+echo "  AWS Region  : ${BACKEND_REGION}"
 echo "  Deploy      : ${AUTO_DEPLOY}"
 echo "=========================================="
 
@@ -72,12 +114,12 @@ cd "$TERRAFORM_ROOT"
 
 echo ""
 echo "==> Initializing Terraform..."
-terraform init -backend-config=backend.hcl
+terraform init -reconfigure -backend-config=backend.hcl
 
 if [ "$AUTO_DEPLOY" = "true" ]; then
   echo ""
   echo "==> Applying Terraform..."
-  terraform apply -var "environment=${ENVIRONMENT}"
+  terraform apply -auto-approve -var "environment=${ENVIRONMENT}"
 else
   echo ""
   echo "==> Planning Terraform..."

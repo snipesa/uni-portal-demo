@@ -40,6 +40,12 @@ if [ -z "$ENVIRONMENT" ]; then
   exit 1
 fi
 
+if [ "$ENVIRONMENT" != "dev" ] && [ "$ENVIRONMENT" != "prod" ]; then
+  echo "Error: -e <environment> must be one of: dev, prod." >&2
+  usage
+  exit 1
+fi
+
 if ! command -v jq >/dev/null 2>&1; then
   echo "Error: jq is required to read terraform output -json." >&2
   exit 1
@@ -55,9 +61,15 @@ if ! command -v zip >/dev/null 2>&1; then
   exit 1
 fi
 
+if ! command -v curl >/dev/null 2>&1; then
+  echo "Error: curl was not found in PATH." >&2
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 TERRAFORM_ROOT="${REPO_ROOT}/infrastructure/terraform/root"
+BACKEND_CONFIG="${TERRAFORM_ROOT}/backend.hcl"
 FRONTEND_DIR="${REPO_ROOT}/frontend-website"
 CONFIG_JS="${FRONTEND_DIR}/config.js"
 BUILD_DIR="$(mktemp -d)"
@@ -72,6 +84,28 @@ trap cleanup EXIT
 if [ ! -d "$FRONTEND_DIR" ]; then
   echo "Error: frontend directory not found: ${FRONTEND_DIR}" >&2
   exit 1
+fi
+
+if [ ! -f "$BACKEND_CONFIG" ]; then
+  echo "Error: backend config not found: ${BACKEND_CONFIG}" >&2
+  exit 1
+fi
+
+BACKEND_REGION="$(sed -nE 's/^[[:space:]]*region[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' "$BACKEND_CONFIG" | tail -n 1)"
+if [ -z "$BACKEND_REGION" ]; then
+  echo "Error: region not found in backend config: ${BACKEND_CONFIG}" >&2
+  exit 1
+fi
+
+export AWS_REGION="$BACKEND_REGION"
+export AWS_DEFAULT_REGION="$BACKEND_REGION"
+export AWS_SDK_LOAD_CONFIG=1
+
+if [ -n "${AWS_PROFILE:-}" ]; then
+  if PROFILE_CREDS="$(aws configure export-credentials --profile "${AWS_PROFILE}" --format env 2>/dev/null)"; then
+    eval "$PROFILE_CREDS"
+    unset AWS_PROFILE
+  fi
 fi
 
 echo "Resolving Terraform outputs from: ${TERRAFORM_ROOT}"
@@ -147,11 +181,27 @@ rm -f "$CONFIG_JS"
 echo "==> Uploading to ${S3_URI}..."
 aws --region "$AWS_REGION" s3 cp "$BUILD_ZIP" "$S3_URI"
 
+echo "==> Creating Amplify deployment job..."
+DEPLOYMENT_JSON="$(aws --region "$AWS_REGION" amplify create-deployment \
+  --app-id "$APP_ID" \
+  --branch-name "$BRANCH_NAME")"
+
+JOB_ID="$(printf '%s' "$DEPLOYMENT_JSON" | jq -r '.jobId // empty')"
+UPLOAD_URL="$(printf '%s' "$DEPLOYMENT_JSON" | jq -r '.zipUploadUrl // empty')"
+
+if [ -z "$JOB_ID" ] || [ -z "$UPLOAD_URL" ]; then
+  echo "Error: failed to create Amplify deployment job (missing jobId or zipUploadUrl)." >&2
+  exit 1
+fi
+
+echo "==> Uploading frontend zip to Amplify upload URL..."
+curl -sS --fail -X PUT -T "$BUILD_ZIP" "$UPLOAD_URL" >/dev/null
+
 echo "==> Starting Amplify deployment..."
 aws --region "$AWS_REGION" amplify start-deployment \
   --app-id "$APP_ID" \
   --branch-name "$BRANCH_NAME" \
-  --source-url "$S3_URI"
+  --job-id "$JOB_ID"
 
 echo ""
 echo "Frontend deployment started."
