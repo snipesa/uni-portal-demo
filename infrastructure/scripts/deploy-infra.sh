@@ -7,17 +7,19 @@ set -euo pipefail
 
 usage() {
   cat <<'EOF'
-Usage: ./deploy-infra.sh -e <environment> [--deploy]
+Usage: ./deploy-infra.sh -e <environment> [--deploy|--destroy]
 
 Options:
   -e, -env   Target environment
   --deploy   Run terraform apply instead of stopping after terraform plan
+  --destroy  Run terraform destroy (non-interactive)
   -h         Show this help message
 EOF
 }
 
 ENVIRONMENT=""
 AUTO_DEPLOY="false"
+AUTO_DESTROY="false"
 
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -27,6 +29,10 @@ while [ "$#" -gt 0 ]; do
       ;;
     --deploy)
       AUTO_DEPLOY="true"
+      shift
+      ;;
+    --destroy)
+      AUTO_DESTROY="true"
       shift
       ;;
     -h|--help)
@@ -49,6 +55,12 @@ fi
 
 if [ "$ENVIRONMENT" != "dev" ] && [ "$ENVIRONMENT" != "prod" ]; then
   echo "Error: -e <environment> must be one of: dev, prod." >&2
+  usage
+  exit 1
+fi
+
+if [ "$AUTO_DEPLOY" = "true" ] && [ "$AUTO_DESTROY" = "true" ]; then
+  echo "Error: --deploy and --destroy cannot be used together." >&2
   usage
   exit 1
 fi
@@ -108,6 +120,7 @@ echo "  Root        : ${TERRAFORM_ROOT}"
 echo "  Backend     : ${BACKEND_CONFIG}"
 echo "  AWS Region  : ${BACKEND_REGION}"
 echo "  Deploy      : ${AUTO_DEPLOY}"
+echo "  Destroy     : ${AUTO_DESTROY}"
 echo "=========================================="
 
 cd "$TERRAFORM_ROOT"
@@ -120,6 +133,10 @@ if [ "$AUTO_DEPLOY" = "true" ]; then
   echo ""
   echo "==> Applying Terraform..."
   terraform apply -auto-approve -var "environment=${ENVIRONMENT}"
+elif [ "$AUTO_DESTROY" = "true" ]; then
+  echo ""
+  echo "==> Destroying Terraform resources..."
+  terraform destroy -auto-approve -var "environment=${ENVIRONMENT}"
 else
   echo ""
   echo "==> Planning Terraform..."
