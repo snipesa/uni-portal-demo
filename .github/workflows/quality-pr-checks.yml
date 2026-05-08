@@ -1,0 +1,68 @@
+name: Quality PR Checks (Placeholders)
+
+on:
+  pull_request:
+    branches:
+      - master  # intentionally disabled for now; enable by switching to main
+
+permissions:
+  contents: read
+
+jobs:
+  detect_changes:
+    name: Detect Changed Areas
+    runs-on: ubuntu-latest
+    outputs:
+      lambda_changed: ${{ steps.filter.outputs.lambda }}
+      frontend_changed: ${{ steps.filter.outputs.frontend }}
+      infra_changed: ${{ steps.filter.outputs.infra }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            lambda:
+              - 'src/lambda/rest-api/**'
+            frontend:
+              - 'frontend-website/**'
+            infra:
+              - 'infrastructure/terraform/**'
+
+  lambda_quality_placeholder:
+    name: Lambda Quality Placeholder
+    runs-on: ubuntu-latest
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.lambda_changed == 'true' }}
+    steps:
+      - name: Placeholder - Lambda checks
+        run: |
+          echo "Placeholder: add Lambda checks here"
+          echo "Examples: Python security scan / dependency vulnerability checks / code quality checks"
+
+  frontend_quality_placeholder:
+    name: Frontend Quality Placeholder
+    runs-on: ubuntu-latest
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.frontend_changed == 'true' }}
+    steps:
+      - name: Placeholder - Frontend checks
+        run: |
+          echo "Placeholder: add frontend checks here"
+          echo "Examples: linting / bundle checks / UI test checks"
+
+  infra_quality_placeholder:
+    name: Infra Quality Placeholder
+    runs-on: ubuntu-latest
+    needs: detect_changes
+    if: ${{ needs.detect_changes.outputs.infra_changed == 'true' }}
+    steps:
+      - name: Placeholder - Terraform checks
+        run: |
+          echo "Placeholder: add terraform checks here"
+          echo "Intended checks: terraform fmt -check"
+          echo "Intended checks: terraform validate"
+          echo "Or run the infra deploy script without the --apply flag to do a plan-only run and check for errors"
