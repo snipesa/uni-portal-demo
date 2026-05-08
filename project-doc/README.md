@@ -11,4 +11,4 @@ Application test URL:
 
 Architecture diagram:
 
-- [Architecture Diagram](./arch-diagramv3.png)
+- [Architecture Diagram](./arch-diagram-final.png)
