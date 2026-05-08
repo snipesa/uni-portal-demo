@@ -70,6 +70,42 @@ terraform output
 - Use the deployed site URL for the main portal, and use `<deployed-url>/admin` for the admin section.
 - In AWS Cognito, create users as needed and add admin users to the `Admin` group so they can access admin features.
 
+## Cleanup
+
+1. Empty the created S3 buckets first (especially upload and artifact buckets), including object versions if versioning is enabled.
+2. Run infrastructure destroy:
+
+```bash
+cd infrastructure/scripts
+./deploy-infra.sh -e <environment> --destroy
+```
+
+## CI/CD Orchestrator (GitHub Actions)
+
+The repository includes one orchestrator workflow (simplified for this project):
+
+- [deploy-orchestrator.yml](./.github/workflows/deploy-orchestrator.yml)
+
+It already includes the full deployment flow and runs these stages in order:
+
+1. Package Lambda (`package-lambda.sh`)
+2. Deploy infrastructure (`deploy-infra.sh --deploy`)
+3. Deploy frontend (`deploy-frontend.sh`)
+
+### Trigger Modes
+
+- `push` to `main`: runs automatically (defaults to `dev` environment).
+- `workflow_dispatch`: manual run with environment selection (`dev` or `prod`) and optional force-run toggles per stage.
+
+### Required GitHub Setup
+
+- Add repository secret: `AWS_ROLE_TO_ASSUME` (IAM role for OIDC).
+- Configure GitHub Environments: `dev` and `prod` (optional approval rules, recommended for `prod`).
+
+### Runtime Behavior
+
+The workflow runs the existing shell scripts on the GitHub Actions runner 
+
 ## Documentation
 
 - [Project Documentation Index](./project-doc/README.md)

@@ -6,7 +6,7 @@ resource "aws_cognito_user_pool" "this" {
   username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
   mfa_configuration        = "OFF"
-  deletion_protection      = var.environment == "prod" ? "ACTIVE" : "INACTIVE"
+  deletion_protection      = "INACTIVE"
 
   username_configuration {
     case_sensitive = false
@@ -25,7 +25,7 @@ resource "aws_cognito_user_pool" "this" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
