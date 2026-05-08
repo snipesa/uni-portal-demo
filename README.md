@@ -70,6 +70,16 @@ terraform output
 - Use the deployed site URL for the main portal, and use `<deployed-url>/admin` for the admin section.
 - In AWS Cognito, create users as needed and add admin users to the `Admin` group so they can access admin features.
 
+## Cleanup
+
+1. Empty the created S3 buckets first (especially upload and artifact buckets), including object versions if versioning is enabled.
+2. Run infrastructure destroy:
+
+```bash
+cd infrastructure/scripts
+./deploy-infra.sh -e <environment> --destroy
+```
+
 ## Documentation
 
 - [Project Documentation Index](./project-doc/README.md)
