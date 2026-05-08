@@ -2,6 +2,7 @@ name: Deploy Orchestrator
 
 on:
   push:
+    # deactivated to use master branch which do not exist
     branches: [master]
   workflow_dispatch:
     inputs:

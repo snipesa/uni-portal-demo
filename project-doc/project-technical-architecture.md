@@ -16,7 +16,7 @@ Submission and Grading Portal.
 
 ## Architecture Diagram
 
-![University Assignment Portal Architecture](./arch-diagramv3.png)
+![University Assignment Portal Architecture](./arch-diagram-final.png)
 
 
 ## Tooling and Services
